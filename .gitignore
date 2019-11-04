@@ -9,6 +9,10 @@
 *.dll
 *.dylib
 
+#Custom Ignore
+*.tlog
+*.ipch
+
 # Qt-es
 object_script.*.Release
 object_script.*.Debug
