@@ -1,5 +1,4 @@
 ﻿#include "TrainView.h"  
-#include "Model.h"
 #include <QtMultimedia/QMediaPlayer>
 #include <assert.h>
 using namespace std;
@@ -32,6 +31,13 @@ void TrainView::initializeGL()
 	nOfFires = 0;
 	Tick1 = Tick2 = GetTickCount();
 	Particles = NULL;
+
+	// 軌道參數
+	curve = 0;          // 軌道類別
+	DIVIDE_LINE = 50;
+	RAIL_WIDTH = 3.f;
+	// 其他物件
+	arrow = new Model(QStringLiteral(":/Object/Resources/object/arrow.obj"), 100, Point3d(-5.f, 0.f, 0.f));
 }
 void TrainView::initializeTexture()
 {
@@ -137,7 +143,6 @@ void TrainView::paintGL()
 	setupObjects();
 
 	drawStuff();
-
 	// this time drawing is for shadows (except for top view)
 	if (this->camera != 1) {
 		setupShadows();
@@ -166,10 +171,6 @@ void TrainView::paintGL()
 	square->End();
 
 	// Particle 特效
-	// Initialize particle
-	//assert(Particles == NULL);
-	//pParticle newParticle = new Particle;
-	//this->InitParticle(*newParticle);
 	this->ProcessParticles();
 	this->DrawParticles();
 }
@@ -259,7 +260,89 @@ void TrainView::drawStuff(bool doingShadows)
 	// TODO: 
 	// call your own track drawing code
 	//####################################################################
-	
+	spline_t type_spline = (spline_t)curve;
+	for (size_t i = 0; i < m_pTrack->points.size(); ++i)
+	{
+		Pnt3f cp_pos_p1 = m_pTrack->points[i].pos;
+		Pnt3f cp_pos_p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].pos;
+		// orient
+		Pnt3f cp_orient_p1 = m_pTrack->points[i].orient;
+		Pnt3f cp_orient_p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].orient;
+
+		/*glLineWidth(4);
+		glBegin(GL_LINES);*/
+		float percent = 1.0f / DIVIDE_LINE;
+		float t = 0;
+		Pnt3f qt, qt1, qt0, qt2, orient_t, cross_t, previous_qt;;
+
+		switch (type_spline)
+		{
+			case spline_Linear:
+				qt = (1 - t) * cp_pos_p1 + t * cp_pos_p2;
+				break;
+		}
+
+		previous_qt = qt;
+		for (size_t j = 0; j < DIVIDE_LINE; j++) {
+			// 處理軌道線條
+			qt0 = qt;
+			switch (type_spline) {
+				case spline_Linear:
+					orient_t = (1 - t) * cp_orient_p1 + t * cp_orient_p2;
+					break;
+			}
+			t += percent;
+
+			switch (type_spline) {
+				case spline_Linear:
+					qt = (1 - t) * cp_pos_p1 + t * cp_pos_p2;
+					break;
+			}
+			qt1 = qt;
+
+			// 向左右延伸距離
+			orient_t.normalize();
+			cross_t = (qt1 - qt0) * orient_t;
+			cross_t.normalize();
+			cross_t = cross_t * 2.5f;
+
+			// 畫出兩側軌道
+			glLineWidth(3);
+			glBegin(GL_LINES);
+			if (!doingShadows) {
+				glColor3ub(32, 32, 64);
+			}
+			glVertex3f(qt0.x + cross_t.x, qt0.y + cross_t.y, qt0.z + cross_t.z);
+			glVertex3f(qt1.x + cross_t.x, qt1.y + cross_t.y, qt1.z + cross_t.z);
+
+			glVertex3f(qt1.x - cross_t.x, qt1.y - cross_t.y, qt1.z - cross_t.z);
+			glVertex3f(qt0.x - cross_t.x, qt0.y - cross_t.y, qt0.z - cross_t.z);
+			glEnd();
+
+			// 畫出鐵軌
+			float dist = distance(previous_qt, qt0);
+			if (dist > 4.f)
+			{
+				Pnt3f tangentP = (qt1 - qt0);
+				tangentP.normalize();
+				tangentP = qt0 + tangentP * RAIL_WIDTH;
+				if (!doingShadows) {
+					glColor3ub(255, 255, 255);
+				}
+				glBegin(GL_POLYGON);
+				glVertex3f(qt0.x + cross_t.x, qt0.y + cross_t.y, qt0.z + cross_t.z);
+				glVertex3f(tangentP.x + cross_t.x, tangentP.y + cross_t.y, tangentP.z + cross_t.z);
+
+				glVertex3f(tangentP.x - cross_t.x, tangentP.y - cross_t.y, tangentP.z - cross_t.z);
+				glVertex3f(qt0.x - cross_t.x, qt0.y - cross_t.y, qt0.z - cross_t.z);
+				glEnd();
+
+				previous_qt = qt0;
+			}
+			glLineWidth(1);
+		}
+	}
+
 
 #ifdef EXAMPLE_SOLUTION
 	drawTrack(this, doingShadows);
@@ -270,8 +353,7 @@ void TrainView::drawStuff(bool doingShadows)
 	// TODO: 
 	//	call your own train drawing code
 	//####################################################################
-	Model *m = new Model(QStringLiteral(":/Object/Resources/object/arrow.obj"), 100, Point3d(0, 0, 0));
-	m->render(false, false);
+	arrow->render(false, false);
 
 
 #ifdef EXAMPLE_SOLUTION
@@ -639,4 +721,13 @@ Explosion3(Particle* par)
 		ep.AddSpeed = 0.2f;
 		AddParticle(ep);
 	}
+}
+
+
+float distance(const Pnt3f &p1, const Pnt3f &p2)
+{
+	float x_2 = (p1.x - p2.x) * (p1.x - p2.x);
+	float y_2 = (p1.y - p2.y) * (p1.y - p2.y);
+	float z_2 = (p1.z - p2.z) * (p1.z - p2.z);
+	return sqrt(x_2 + y_2 + z_2);
 }

@@ -11,6 +11,7 @@
 #include "Track.H"
 #include "Triangle.h"
 #include "Square.h"
+#include "Model.h"
 
 class AppMain;
 class CTrack;
@@ -36,6 +37,13 @@ typedef struct tag_PARTICLE
 	tag_PARTICLE* pNext;//下一particle 
 	tag_PARTICLE* pPrev;//上一particle   
 } Particle, *pParticle;
+
+typedef enum {
+	spline_Linear = 0,
+	spline_CardinalCubic = 1,
+	spline_CubicB_Spline = 2
+} spline_t;
+
 //#######################################################################
 // TODO
 // You might change the TrainView in order to add different objects to
@@ -80,16 +88,35 @@ public:
 	int				selectedCube;  // simple - just remember which cube is selected
 
 	CTrack*			m_pTrack;		// The track of the entire scene
+	int camera;
+	int curve;
+	int track;
+	bool isrun;
+
+	Triangle* triangle;
+	Square* square;
+	GLfloat ProjectionMatrex[16];
+	GLfloat ModelViewMatrex[16];
+	QVector<QOpenGLTexture*> Textures;
+
+	float t_time;
+	unsigned int DIVIDE_LINE;
+	float RAIL_WIDTH;
+	// **********************************
+	// ********** 其他小物件   **********
+	// **********************************
+	Model *arrow;
+
+
+	// **********************************
+	// ****** Particle Parameter   ******
+	// **********************************
 	pParticle Particles;
 	UINT nOfFires;
 	UINT Tick1, Tick2;  //(GetTickCount())
 	float DTick;  //(float(Tick2 - Tick1))
 	GLfloat grav; //(0.00003f)
-
 	GLuint textureID;
-
-
-
 	void DeleteParticle(pParticle* p);
 	void DeleteAll(pParticle* Part);
 	void AddParticle(Particle ex);
@@ -100,16 +127,9 @@ public:
 	void Explosion3(Particle* par);
 #define MAX_PARTICLES 1000  
 #define MAX_FIRES 5  
-
-	int camera;
-	int curve;
-	int track;
-	bool isrun;
-	Triangle* triangle;
-	Square* square;
-	GLfloat ProjectionMatrex[16];
-	GLfloat ModelViewMatrex[16];
-	QVector<QOpenGLTexture*> Textures;
-
 };  
+
+
+float distance(const Pnt3f &p1, const Pnt3f &p2);
+
 #endif // TRAINVIEW_H  

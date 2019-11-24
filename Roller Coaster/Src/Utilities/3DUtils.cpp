@@ -280,7 +280,7 @@ void mousePoleGo(double r1x, double r1y, double r1z,
 	// we have already made sure that the elevator is not singular
 	double yp = (ly - r1y) / yd;
 	rx = r1x + (r1x - r2x) * yp;
-	rz = r1z + (r1z - r2z) * yp;
+	rz = r1z + (r1z - r2z) * yp - 51.f;  //50.f¦hªº
   }
 }
 
