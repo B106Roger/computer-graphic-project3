@@ -1,4 +1,4 @@
-#ifndef TRAINVIEW_H  
+﻿#ifndef TRAINVIEW_H  
 #define TRAINVIEW_H  
 #include <QGLWidget> 
 #include <QtGui>  
@@ -14,7 +14,28 @@
 
 class AppMain;
 class CTrack;
-
+typedef struct tag_PARTICLE
+{
+	GLfloat xpos;//(xpos,ypos,zpos)為particle的position
+	GLfloat ypos;
+	GLfloat zpos;
+	GLfloat xspeed;//(xspeed,yspeed,zspeed)為particle的speed
+	GLfloat yspeed;
+	GLfloat zspeed;
+	GLfloat r;//(r,g,b)為particle的color
+	GLfloat g;
+	GLfloat b;
+	GLfloat life;// particle的壽命 
+	GLfloat fade;// particle的衰減速度
+	GLfloat size;// particle的大小  
+	GLbyte bFire;
+	GLbyte nExpl;//哪種particle效果  
+	GLbyte bAddParts;// particle是否含有尾巴
+	GLfloat AddSpeed;//尾巴粒子的加速度  
+	GLfloat AddCount;//尾巴粒子的增加量  
+	tag_PARTICLE* pNext;//下一particle 
+	tag_PARTICLE* pPrev;//上一particle   
+} Particle, *pParticle;
 //#######################################################################
 // TODO
 // You might change the TrainView in order to add different objects to
@@ -38,7 +59,7 @@ public:
 	// it has to be encapsulated, since we draw differently if
 	// we're drawing shadows (no colors, for example)
 	void drawStuff(bool doingShadows=false);
-
+	void DrawParticles();
 	// setup the projection - assuming that the projection stack has been
 	// cleared for you
 	void setProjection();
@@ -51,6 +72,7 @@ public:
 
 	void initializeGL();
 	void initializeTexture();
+	void initializeMedia();
 
 
 public:
@@ -58,6 +80,26 @@ public:
 	int				selectedCube;  // simple - just remember which cube is selected
 
 	CTrack*			m_pTrack;		// The track of the entire scene
+	pParticle Particles;
+	UINT nOfFires;
+	UINT Tick1, Tick2;  //(GetTickCount())
+	float DTick;  //(float(Tick2 - Tick1))
+	GLfloat grav; //(0.00003f)
+
+	GLuint textureID;
+
+
+
+	void DeleteParticle(pParticle* p);
+	void DeleteAll(pParticle* Part);
+	void AddParticle(Particle ex);
+	void ProcessParticles();
+	void InitParticle(Particle& ep);
+	void Explosion1(Particle* par);
+	void Explosion2(Particle* par);
+	void Explosion3(Particle* par);
+#define MAX_PARTICLES 1000  
+#define MAX_FIRES 5  
 
 	int camera;
 	int curve;
