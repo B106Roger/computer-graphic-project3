@@ -1,6 +1,8 @@
 ﻿#include "TrainView.h"  
 #include <QtMultimedia/QMediaPlayer>
 #include <assert.h>
+#include "AppMain.h"
+
 using namespace std;
 TrainView::TrainView(QWidget *parent) :  
 QGLWidget(parent)  
@@ -34,10 +36,16 @@ void TrainView::initializeGL()
 
 	// 軌道參數
 	curve = 0;          // 軌道類別
-	DIVIDE_LINE = 50;
+	DIVIDE_LINE = 100;
 	RAIL_WIDTH = 3.f;
 	// 其他物件
 	arrow = new Model(QStringLiteral(":/Object/Resources/object/arrow.obj"), 100, Point3d(-5.f, 0.f, 0.f));
+	// 初始化火車時間
+	t_time = 0.f;
+	// 初始化火車跑布林參數
+	isrun = false;
+	// 火車速度
+	TRAIN_SPEED = 0.1f;
 }
 void TrainView::initializeTexture()
 {
@@ -353,6 +361,8 @@ void TrainView::drawStuff(bool doingShadows)
 	// TODO: 
 	//	call your own train drawing code
 	//####################################################################
+	AppMain::getInstance()->advanceTrain();
+	this->drawTrain(t_time);
 	arrow->render(false, false);
 
 
@@ -721,6 +731,43 @@ Explosion3(Particle* par)
 		ep.AddSpeed = 0.2f;
 		AddParticle(ep);
 	}
+}
+
+void TrainView::
+drawTrain(float t)
+{
+	t *= m_pTrack->points.size();
+	size_t i;
+	for (i = 0; t > 1; t -= 1)
+		i++;
+	//pos
+	Pnt3f cp_pos_p1 = m_pTrack->points[i].pos;
+	Pnt3f cp_pos_p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].pos;
+
+	// orient
+	Pnt3f cp_orient_p1 = m_pTrack->points[i].orient;
+	Pnt3f cp_orient_p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].orient;
+
+	spline_t type_spline = (spline_t)curve;
+	Pnt3f qt, orient_t;
+	switch (type_spline) {
+	case spline_Linear:
+		// Linear
+		qt = (1 - t) * cp_pos_p1 + t * cp_pos_p2;
+		orient_t = (1 - t) * cp_orient_p1 + t * cp_orient_p2;
+		break;
+	}
+	glColor3ub(255, 255, 255);
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0f, 0.0f);
+	glVertex3f(qt.x - 5, qt.y - 5, qt.z - 5);
+	glTexCoord2f(1.0f, 0.0f);
+	glVertex3f(qt.x + 5, qt.y - 5, qt.z - 5);
+	glTexCoord2f(1.0f, 1.0f);
+	glVertex3f(qt.x + 5, qt.y + 5, qt.z - 5);
+	glTexCoord2f(0.0f, 1.0f);
+	glVertex3f(qt.x - 5, qt.y + 5, qt.z - 5);
+	glEnd();
 }
 
 

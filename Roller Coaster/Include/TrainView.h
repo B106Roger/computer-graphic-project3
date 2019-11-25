@@ -102,6 +102,11 @@ public:
 	float t_time;
 	unsigned int DIVIDE_LINE;
 	float RAIL_WIDTH;
+	float TRAIN_SPEED;
+	void drawTrain(float);
+	//void advanceTrain(float dir = 1);
+
+	
 	// **********************************
 	// ********** 其他小物件   **********
 	// **********************************
