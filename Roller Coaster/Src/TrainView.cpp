@@ -36,7 +36,7 @@ void TrainView::initializeGL()
 
 	// 軌道參數
 	curve = 0;          // 軌道類別
-	DIVIDE_LINE = 100;
+	DIVIDE_LINE = 80;
 	RAIL_WIDTH = 3.f;
 	// 其他物件
 	arrow = new Model(QStringLiteral(":/Object/Resources/object/arrow.obj"), 100, Point3d(-5.f, 0.f, 0.f));
@@ -46,6 +46,32 @@ void TrainView::initializeGL()
 	isrun = false;
 	// 火車速度
 	TRAIN_SPEED = 0.1f;
+	// 火車軌道曲線
+	vector<vector<float>> 
+	spline_Linear = 
+	{
+		{1,0,0,0},
+		{0,1,0,0},
+		{0,0,1,0},
+		{0,0,0,1},
+	},
+	spline_CardinalCubic = 
+	{
+		{    -0.5,   1, -0.5,       0},
+		{     1.5,-2.5,    0,       1},
+		{    -1.5,   2,  0.5,       0},
+		{     0.5,-0.5,    0,       0},
+	},
+	spline_CubicB_Spline = 
+	{
+		{-1.f / 6, 0.5, -0.5, 1.f / 6},
+		{     0.5,  -1,    0, 2.f / 3},
+		{    -0.5, 0.5,  0.5, 1.f / 6},
+		{ 1.f / 6,   0,    0,       0},
+	};
+	M_curve.push_back(spline_Linear);
+	M_curve.push_back(spline_CardinalCubic);
+	M_curve.push_back(spline_CubicB_Spline);
 }
 void TrainView::initializeTexture()
 {
@@ -269,87 +295,204 @@ void TrainView::drawStuff(bool doingShadows)
 	// call your own track drawing code
 	//####################################################################
 	spline_t type_spline = (spline_t)curve;
-	for (size_t i = 0; i < m_pTrack->points.size(); ++i)
+
+	switch (type_spline)
 	{
-		Pnt3f cp_pos_p1 = m_pTrack->points[i].pos;
-		Pnt3f cp_pos_p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].pos;
-		// orient
-		Pnt3f cp_orient_p1 = m_pTrack->points[i].orient;
-		Pnt3f cp_orient_p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].orient;
-
-		/*glLineWidth(4);
-		glBegin(GL_LINES);*/
-		float percent = 1.0f / DIVIDE_LINE;
-		float t = 0;
-		Pnt3f qt, qt1, qt0, qt2, orient_t, cross_t, previous_qt;;
-
-		switch (type_spline)
+		case spline_Linear:
 		{
-			case spline_Linear:
-				qt = (1 - t) * cp_pos_p1 + t * cp_pos_p2;
-				break;
-		}
-
-		previous_qt = qt;
-		for (size_t j = 0; j < DIVIDE_LINE; j++) {
-			// 處理軌道線條
-			qt0 = qt;
-			switch (type_spline) {
-				case spline_Linear:
-					orient_t = (1 - t) * cp_orient_p1 + t * cp_orient_p2;
-					break;
-			}
-			t += percent;
-
-			switch (type_spline) {
-				case spline_Linear:
-					qt = (1 - t) * cp_pos_p1 + t * cp_pos_p2;
-					break;
-			}
-			qt1 = qt;
-
-			// 向左右延伸距離
-			orient_t.normalize();
-			cross_t = (qt1 - qt0) * orient_t;
-			cross_t.normalize();
-			cross_t = cross_t * 2.5f;
-
-			// 畫出兩側軌道
-			glLineWidth(3);
-			glBegin(GL_LINES);
-			if (!doingShadows) {
-				glColor3ub(32, 32, 64);
-			}
-			glVertex3f(qt0.x + cross_t.x, qt0.y + cross_t.y, qt0.z + cross_t.z);
-			glVertex3f(qt1.x + cross_t.x, qt1.y + cross_t.y, qt1.z + cross_t.z);
-
-			glVertex3f(qt1.x - cross_t.x, qt1.y - cross_t.y, qt1.z - cross_t.z);
-			glVertex3f(qt0.x - cross_t.x, qt0.y - cross_t.y, qt0.z - cross_t.z);
-			glEnd();
-
-			// 畫出鐵軌
-			float dist = distance(previous_qt, qt0);
-			if (dist > 4.f)
+			for (size_t i = 0; i < m_pTrack->points.size(); ++i)
 			{
-				Pnt3f tangentP = (qt1 - qt0);
-				tangentP.normalize();
-				tangentP = qt0 + tangentP * RAIL_WIDTH;
-				if (!doingShadows) {
-					glColor3ub(255, 255, 255);
+				Pnt3f cp_pos_p1 = m_pTrack->points[i].pos;
+				Pnt3f cp_pos_p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].pos;
+				// orient
+				Pnt3f cp_orient_p1 = m_pTrack->points[i].orient;
+				Pnt3f cp_orient_p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].orient;
+
+
+
+				float percent = 1.0f / DIVIDE_LINE;
+				float t = 0;
+				Pnt3f qt, qt0, qt1, qt2, orient_t, cross_t, previous_qt;
+
+				// 用控制點求出內差點
+				qt = (1 - t) * cp_pos_p1 + t * cp_pos_p2;
+
+				previous_qt = qt;
+				for (size_t j = 0; j < DIVIDE_LINE; j++) {
+					// 處理軌道線條
+					qt0 = qt;
+					orient_t = (1 - t) * cp_orient_p1 + t * cp_orient_p2;
+
+					t += percent;
+
+					qt = (1 - t) * cp_pos_p1 + t * cp_pos_p2;
+					qt1 = qt;
+
+					// 向左右延伸距離
+					orient_t.normalize();
+					cross_t = (qt1 - qt0) * orient_t;
+					cross_t.normalize();
+					cross_t = cross_t * 2.5f;
+
+					// 畫出兩側軌道
+					glLineWidth(3);
+
+					if (!doingShadows) {
+						glColor3ub(32, 32, 64);
+					}
+					glBegin(GL_LINES);
+					glVertex3f(qt0.x + cross_t.x, qt0.y + cross_t.y, qt0.z + cross_t.z);
+					glVertex3f(qt1.x + cross_t.x, qt1.y + cross_t.y, qt1.z + cross_t.z);
+
+					glVertex3f(qt1.x - cross_t.x, qt1.y - cross_t.y, qt1.z - cross_t.z);
+					glVertex3f(qt0.x - cross_t.x, qt0.y - cross_t.y, qt0.z - cross_t.z);
+					glEnd();
+
+					// 畫出鐵軌板子
+					float dist = distance(previous_qt, qt0);
+					if (dist > RAIL_WIDTH * 2.f)
+					{
+						Pnt3f tangentP = (qt1 - qt0);
+						tangentP.normalize();
+						tangentP = qt0 + tangentP * RAIL_WIDTH;
+						if (!doingShadows) {
+							glColor3ub(255, 255, 255);
+						}
+						glBegin(GL_POLYGON);
+						glVertex3f(qt0.x + cross_t.x, qt0.y + cross_t.y, qt0.z + cross_t.z);
+						glVertex3f(tangentP.x + cross_t.x, tangentP.y + cross_t.y, tangentP.z + cross_t.z);
+
+						glVertex3f(tangentP.x - cross_t.x, tangentP.y - cross_t.y, tangentP.z - cross_t.z);
+						glVertex3f(qt0.x - cross_t.x, qt0.y - cross_t.y, qt0.z - cross_t.z);
+						glEnd();
+
+						previous_qt = qt0;
+					}
+					glLineWidth(1);
 				}
-				glBegin(GL_POLYGON);
-				glVertex3f(qt0.x + cross_t.x, qt0.y + cross_t.y, qt0.z + cross_t.z);
-				glVertex3f(tangentP.x + cross_t.x, tangentP.y + cross_t.y, tangentP.z + cross_t.z);
-
-				glVertex3f(tangentP.x - cross_t.x, tangentP.y - cross_t.y, tangentP.z - cross_t.z);
-				glVertex3f(qt0.x - cross_t.x, qt0.y - cross_t.y, qt0.z - cross_t.z);
-				glEnd();
-
-				previous_qt = qt0;
 			}
-			glLineWidth(1);
+			break;
+		}
+		default:
+		{
+			const vector<vector<float>> &M = M_curve[this->curve];
+			for (size_t i = 0; i < m_pTrack->points.size(); ++i)
+			{
+				// position
+				const Pnt3f &cp_pos_p1 = m_pTrack->points[i].pos;
+				const Pnt3f &cp_pos_p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].pos;
+				const Pnt3f &cp_pos_p3 = m_pTrack->points[(i + 2) % m_pTrack->points.size()].pos;
+				const Pnt3f &cp_pos_p4 = m_pTrack->points[(i + 3) % m_pTrack->points.size()].pos;
+				// orient
+				const Pnt3f &cp_orient_p1 = m_pTrack->points[i].orient;
+				const Pnt3f &cp_orient_p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].orient;
+				const Pnt3f &cp_orient_p3 = m_pTrack->points[(i + 2) % m_pTrack->points.size()].orient;
+				const Pnt3f &cp_orient_p4 = m_pTrack->points[(i + 3) % m_pTrack->points.size()].orient;
+				
+				const vector<vector<float>> 
+				G = {
+					{cp_pos_p1.x,cp_pos_p2.x,cp_pos_p3.x,cp_pos_p4.x},
+					{cp_pos_p1.y,cp_pos_p2.y,cp_pos_p3.y,cp_pos_p4.y},
+					{cp_pos_p1.z,cp_pos_p2.z,cp_pos_p3.z,cp_pos_p4.z},
+				},
+				G_orient = {
+					{cp_orient_p1.x,cp_orient_p2.x,cp_orient_p3.x,cp_orient_p4.x},
+					{cp_orient_p1.y,cp_orient_p2.y,cp_orient_p3.y,cp_orient_p4.y},
+					{cp_orient_p1.z,cp_orient_p2.z,cp_orient_p3.z,cp_orient_p4.z},
+				};
+
+				float percent = 1.0f / (DIVIDE_LINE);
+				float t = 0;
+				Pnt3f qt, qt0, qt1, qt2, orient_t, cross_t, previous_qt;
+
+				vector<vector<float>> 
+				T =
+				{
+					{0},
+					{0},
+					{0},
+					{1}
+				};
+				// 用控制點求出內差點
+				vector<vector<float>> qt_v = Multiply(G, Multiply(M,T));
+				qt = Pnt3f(qt_v[0][0], qt_v[1][0], qt_v[2][0]);
+
+
+				previous_qt = qt;
+				for (size_t j = 0; j < DIVIDE_LINE; j++) 
+				{
+					// 處理軌道線條
+					T = {
+						{pow(t,3)},
+						{pow(t,2)},
+						{t},
+						{1}
+					};
+					qt_v = Multiply(G, Multiply(M, T));
+					qt0 = Pnt3f(qt_v[0][0], qt_v[1][0], qt_v[2][0]);
+
+
+					vector<vector<float>> orient_v = Multiply(G_orient, Multiply(M, T));
+					orient_t = Pnt3f(orient_v[0][0], orient_v[1][0], orient_v[2][0]);
+
+
+					t += percent;
+					T = {
+						{pow(t,3)},
+						{pow(t,2)},
+						{t},
+						{1}
+					};
+					qt_v = Multiply(G, Multiply(M, T));
+					qt1 = Pnt3f(qt_v[0][0], qt_v[1][0], qt_v[2][0]);
+
+					// 向左右延伸距離
+					orient_t.normalize();
+					cross_t = (qt1 - qt0) * orient_t;
+					cross_t.normalize();
+					cross_t = cross_t * 2.5f;
+
+					// 畫出兩側軌道
+					glLineWidth(3);
+
+					if (!doingShadows) {
+						glColor3ub(32, 32, 64);
+					}
+					glBegin(GL_LINES);
+					glVertex3f(qt0.x + cross_t.x, qt0.y + cross_t.y, qt0.z + cross_t.z);
+					glVertex3f(qt1.x + cross_t.x, qt1.y + cross_t.y, qt1.z + cross_t.z);
+
+					glVertex3f(qt1.x - cross_t.x, qt1.y - cross_t.y, qt1.z - cross_t.z);
+					glVertex3f(qt0.x - cross_t.x, qt0.y - cross_t.y, qt0.z - cross_t.z);
+					glEnd();
+
+					// 畫出鐵軌板子
+					float dist = distance(previous_qt, qt0);
+					if (dist > RAIL_WIDTH * 2.f)
+					{
+						Pnt3f tangentP = (qt1 - qt0);
+						tangentP.normalize();
+						tangentP = qt0 + tangentP * RAIL_WIDTH;
+						if (!doingShadows) {
+							glColor3ub(255, 255, 255);
+						}
+						glBegin(GL_POLYGON);
+						glVertex3f(     qt0.x + cross_t.x,      qt0.y + cross_t.y,      qt0.z + cross_t.z);
+						glVertex3f(tangentP.x + cross_t.x, tangentP.y + cross_t.y, tangentP.z + cross_t.z);
+
+						glVertex3f(tangentP.x - cross_t.x, tangentP.y - cross_t.y, tangentP.z - cross_t.z);
+						glVertex3f(     qt0.x - cross_t.x,      qt0.y - cross_t.y,      qt0.z - cross_t.z);
+						glEnd();
+
+						previous_qt = qt0;
+					}
+					glLineWidth(1);
+				}
+			}
+			break;
 		}
 	}
+	
 
 
 #ifdef EXAMPLE_SOLUTION
@@ -740,33 +883,89 @@ drawTrain(float t)
 	size_t i;
 	for (i = 0; t > 1; t -= 1)
 		i++;
-	//pos
-	Pnt3f cp_pos_p1 = m_pTrack->points[i].pos;
-	Pnt3f cp_pos_p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].pos;
 
+	// position
+	const Pnt3f &cp_pos_p1 = m_pTrack->points[i].pos;
+	const Pnt3f &cp_pos_p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].pos;
+	const Pnt3f &cp_pos_p3 = m_pTrack->points[(i + 2) % m_pTrack->points.size()].pos;
+	const Pnt3f &cp_pos_p4 = m_pTrack->points[(i + 3) % m_pTrack->points.size()].pos;
+	
 	// orient
-	Pnt3f cp_orient_p1 = m_pTrack->points[i].orient;
-	Pnt3f cp_orient_p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].orient;
+	const Pnt3f &cp_orient_p1 = m_pTrack->points[i].orient;
+	const Pnt3f &cp_orient_p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].orient;
+	const Pnt3f &cp_orient_p3 = m_pTrack->points[(i + 2) % m_pTrack->points.size()].orient;
+	const Pnt3f &cp_orient_p4 = m_pTrack->points[(i + 3) % m_pTrack->points.size()].orient;
+
+	vector<vector<float>> &M = M_curve[this->curve];
+	vector<vector<float>> T;
+	vector<vector<float>> G = {
+		{cp_pos_p1.x,cp_pos_p2.x,cp_pos_p3.x,cp_pos_p4.x},
+		{cp_pos_p1.y,cp_pos_p2.y,cp_pos_p3.y,cp_pos_p4.y},
+		{cp_pos_p1.z,cp_pos_p2.z,cp_pos_p3.z,cp_pos_p4.z}
+	};
+	vector<vector<float>> G_orient = {
+		{cp_orient_p1.x,cp_orient_p2.x,cp_orient_p3.x,cp_orient_p4.x},
+		{cp_orient_p1.y,cp_orient_p2.y,cp_orient_p3.y,cp_orient_p4.y},
+		{cp_orient_p1.z,cp_orient_p2.z,cp_orient_p3.z,cp_orient_p4.z}
+	}, tmp;
+
 
 	spline_t type_spline = (spline_t)curve;
-	Pnt3f qt, orient_t;
+	Pnt3f qt, qt0, qt1, orient_t, cross_t;
+	switch (type_spline) {
+		case spline_Linear:
+			// Linear
+			qt = (1 - t) * cp_pos_p1 + t * cp_pos_p2;
+			orient_t = (1 - t) * cp_orient_p1 + t * cp_orient_p2;
+			break;
+
+		case spline_CardinalCubic:
+		case spline_CubicB_Spline:
+			T = { {pow(t,3)}, {pow(t,2)}, {t}, {1} };
+			tmp = Multiply(G_orient, Multiply(M, T));
+			orient_t = Pnt3f(tmp[0][0], tmp[1][0], tmp[2][0]);
+			tmp = Multiply(G, Multiply(M, T));
+			qt = Pnt3f(tmp[0][0], tmp[1][0], tmp[2][0]);
+			break;
+	}
+	qt0 = qt;
+
+	t += 0.01f;
 	switch (type_spline) {
 	case spline_Linear:
 		// Linear
 		qt = (1 - t) * cp_pos_p1 + t * cp_pos_p2;
 		orient_t = (1 - t) * cp_orient_p1 + t * cp_orient_p2;
 		break;
+
+	case spline_CardinalCubic:
+	case spline_CubicB_Spline:
+		T = { {pow(t,3)}, {pow(t,2)}, {t}, {1} };
+		tmp = Multiply(G_orient, Multiply(M, T));
+		orient_t = Pnt3f(tmp[0][0], tmp[1][0], tmp[2][0]);
+		tmp = Multiply(G, Multiply(M, T));
+		qt = Pnt3f(tmp[0][0], tmp[1][0], tmp[2][0]);
+		break;
 	}
-	glColor3ub(255, 255, 255);
-	glBegin(GL_QUADS);
-	glTexCoord2f(0.0f, 0.0f);
-	glVertex3f(qt.x - 5, qt.y - 5, qt.z - 5);
-	glTexCoord2f(1.0f, 0.0f);
-	glVertex3f(qt.x + 5, qt.y - 5, qt.z - 5);
-	glTexCoord2f(1.0f, 1.0f);
-	glVertex3f(qt.x + 5, qt.y + 5, qt.z - 5);
-	glTexCoord2f(0.0f, 1.0f);
-	glVertex3f(qt.x - 5, qt.y + 5, qt.z - 5);
+	qt1 = qt;
+
+
+	orient_t.normalize();
+	cross_t = (qt1 - qt0) * orient_t;
+	cross_t.normalize();
+	cross_t = cross_t * 2.5f;
+	orient_t = 5 * orient_t;
+
+	qt1 = qt0 - cross_t;
+	qt0 = qt0 + cross_t;
+
+	
+	glBegin(GL_POLYGON);
+	glVertex3f(qt0.x, qt0.y, qt0.z);
+	glVertex3f(qt0.x + orient_t.x, qt0.y + orient_t.y, qt0.z + orient_t.z);
+
+	glVertex3f(qt1.x + orient_t.x, qt1.y + orient_t.y, qt1.z + orient_t.z);
+	glVertex3f(qt1.x, qt1.y, qt1.z );
 	glEnd();
 }
 
@@ -777,4 +976,19 @@ float distance(const Pnt3f &p1, const Pnt3f &p2)
 	float y_2 = (p1.y - p2.y) * (p1.y - p2.y);
 	float z_2 = (p1.z - p2.z) * (p1.z - p2.z);
 	return sqrt(x_2 + y_2 + z_2);
+}
+vector<vector<float>> Multiply(const vector<vector<float>> &m1, const vector<vector<float>> &m2)
+{
+	vector<vector<float>> result(m1.size(), vector<float>(m2[0].size(), 0));
+	for (int i = 0; i < result.size(); i++)
+	{
+		for (int j = 0; j < result[0].size(); j++)
+		{
+			for (int k = 0; k < m1[0].size(); k++)
+			{
+				result[i][j] += m1[i][k] * m2[k][j];
+			}
+		}
+	}
+	return result;
 }

@@ -92,6 +92,7 @@ public:
 	int curve;
 	int track;
 	bool isrun;
+	vector<vector<vector<float>>> M_curve;
 
 	Triangle* triangle;
 	Square* square;
@@ -136,5 +137,5 @@ public:
 
 
 float distance(const Pnt3f &p1, const Pnt3f &p2);
-
+vector<vector<float>> Multiply(const vector<vector<float>> &m1, const vector<vector<float>> &m2);
 #endif // TRAINVIEW_H  
