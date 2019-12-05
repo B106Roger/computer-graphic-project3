@@ -39,7 +39,9 @@ void TrainView::initializeGL()
 	DIVIDE_LINE = 80;
 	RAIL_WIDTH = 3.f;
 	// 其他物件
-	arrow = new Model(QStringLiteral(":/Object/Resources/object/arrow.obj"), 100, Point3d(-5.f, 0.f, 0.f));
+	arrow = new Model(QStringLiteral(":/Object/Resources/Object/Transport_Shuttle_obj.obj"), 20, Point3d(-6.f, 10.f, 3.f));
+	//tmp = new Model(QStringLiteral(":/Object/Resources/object/arrow.obj"), 100, Point3d(0.f, 0.f, 3.f));
+
 	// 初始化火車時間
 	t_time = 0.f;
 	// 初始化火車跑布林參數
@@ -207,6 +209,9 @@ void TrainView::paintGL()
 	// Particle 特效
 	this->ProcessParticles();
 	this->DrawParticles();
+
+	arrow->render(false, false);
+
 }
 
 //************************************************************************
@@ -506,7 +511,8 @@ void TrainView::drawStuff(bool doingShadows)
 	//####################################################################
 	AppMain::getInstance()->advanceTrain();
 	this->drawTrain(t_time);
-	arrow->render(false, false);
+	
+	//tmp->render(false, false);
 
 
 #ifdef EXAMPLE_SOLUTION

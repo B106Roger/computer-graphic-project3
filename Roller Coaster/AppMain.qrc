@@ -12,5 +12,6 @@
     </qresource>
     <qresource prefix="/Object">
         <file>Resources/object/arrow.obj</file>
+        <file>Resources/Object/Transport_Shuttle_obj.obj</file>
     </qresource>
 </RCC>

@@ -40,8 +40,18 @@ void Triangle::Paint(GLfloat* ProjectionMatrix, GLfloat* ModelViewMatrix)
 	//unbind buffer
 	vvbo.release();
 
+	//Set each vertex's color
+	clock_t time = clock();
+	float color = sin(time / 1000.f);
+	colors.clear();
+	colors << QVector3D(0.0f, color, 0.0f)
+		<< QVector3D(color, 0.0f, 0.0f)
+		<< QVector3D(0.0f, 0.0f, color);
+
 	// Bind the buffer so that it is the current active buffer
 	cvbo.bind();
+	//// Allocate and initialize the information
+	cvbo.allocate(colors.constData(), colors.size() * sizeof(QVector3D));
 	// Enable Attribute 1
 	shaderProgram->enableAttributeArray(1);
 	// Set Attribute 0 to be color

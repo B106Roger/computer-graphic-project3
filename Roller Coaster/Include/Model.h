@@ -21,7 +21,12 @@ public:
 	int edges() const { return m_edgeIndices.size() / 2; }
 	int points() const { return m_points.size(); }
 
+	void updatePosition(Point3d);
+
 private:
+	Point3d boundsMin;
+	Point3d boundsMax;
+	int scale;
 	QString m_fileName;
 	QVector<Point3d> m_points;
 	QVector<Point3d> m_normals;

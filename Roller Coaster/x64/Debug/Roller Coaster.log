@@ -1,2 +1,4 @@
-﻿  TrainView.cpp
+﻿  Rcc'ing AppMain.qrc...
+  TrainView.cpp
+  qrc_AppMain.cpp
   Roller Coaster.vcxproj -> D:\GitHub\computer-graphic-project3\x64\Debug\Roller Coaster.exe
