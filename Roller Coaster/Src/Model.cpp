@@ -16,6 +16,7 @@ Model::Model(const QString &filePath, int s, Point3d p)
 	boundsMin = Point3d( 1e9, 1e9, 1e9);
 	boundsMax = Point3d(-1e9,-1e9,-1e9);
 	scale = s;
+	position = p;
 
 	QTextStream in(&file);
 	while (!in.atEnd()) {
@@ -64,10 +65,13 @@ Model::Model(const QString &filePath, int s, Point3d p)
 
 	const Point3d bounds = boundsMax - boundsMin;
 	const qreal scale = s / qMax(bounds.x, qMax(bounds.y, bounds.z));
-	for (int i = 0; i < m_points.size(); ++i)
-		m_points[i] = (m_points[i] + p - (boundsMin + bounds * 0.5)) * scale;
 
+	m_target_points.resize(m_points.size());
+	m_target_normals.resize(m_points.size());
 	m_normals.resize(m_points.size());
+	for (int i = 0; i < m_points.size(); ++i)
+		m_target_points[i] = (m_points[i] + p - (boundsMin + bounds * 0.5)) * scale;
+
 	for (int i = 0; i < m_pointIndices.size(); i += 3) {
 		const Point3d a = m_points.at(m_pointIndices.at(i));
 		const Point3d b = m_points.at(m_pointIndices.at(i+1));
@@ -76,11 +80,11 @@ Model::Model(const QString &filePath, int s, Point3d p)
 		const Point3d normal = cross(b - a, c - a).normalize();
 
 		for (int j = 0; j < 3; ++j)
-			m_normals[m_pointIndices.at(i + j)] += normal;
+			m_target_normals[m_pointIndices.at(i + j)] += normal;
 	}
 
-	for (int i = 0; i < m_normals.size(); ++i)
-		m_normals[i] = m_normals[i].normalize();
+	for (int i = 0; i < m_target_normals.size(); ++i)
+		m_target_normals[i] = m_target_normals[i].normalize();
 }
 
 void Model::render(bool wireframe, bool normals) const
@@ -88,7 +92,7 @@ void Model::render(bool wireframe, bool normals) const
 	glEnable(GL_DEPTH_TEST);
 	glEnableClientState(GL_VERTEX_ARRAY);
 	if (wireframe) {
-		glVertexPointer(3, GL_FLOAT, 0, (float *)m_points.data());
+		glVertexPointer(3, GL_FLOAT, 0, (float *)m_target_points.data());
 		glDrawElements(GL_LINES, m_edgeIndices.size(), GL_UNSIGNED_INT, m_edgeIndices.data());
 	} else {
 		glEnable(GL_LIGHTING);
@@ -97,8 +101,8 @@ void Model::render(bool wireframe, bool normals) const
 		glShadeModel(GL_SMOOTH);
 
 		glEnableClientState(GL_NORMAL_ARRAY);
-		glVertexPointer(3, GL_FLOAT, 0, (float *)m_points.data());
-		glNormalPointer(GL_FLOAT, 0, (float *)m_normals.data());
+		glVertexPointer(3, GL_FLOAT, 0, (float *)m_target_points.data());
+		glNormalPointer(GL_FLOAT, 0, (float *)m_target_normals.data());
 		glDrawElements(GL_TRIANGLES, m_pointIndices.size(), GL_UNSIGNED_INT, m_pointIndices.data());
 
 		glDisableClientState(GL_NORMAL_ARRAY);
@@ -109,8 +113,8 @@ void Model::render(bool wireframe, bool normals) const
 
 	if (normals) {
 		QVector<Point3d> normals;
-		for (int i = 0; i < m_normals.size(); ++i)
-			normals << m_points.at(i) << (m_points.at(i) + m_normals.at(i) * 0.02f);
+		for (int i = 0; i < m_target_normals.size(); ++i)
+			normals << m_target_points.at(i) << (m_target_points.at(i) + m_target_normals.at(i) * 0.02f);
 		glVertexPointer(3, GL_FLOAT, 0, (float *)normals.data());
 		glDrawArrays(GL_LINES, 0, normals.size());
 	}
@@ -120,23 +124,29 @@ void Model::render(bool wireframe, bool normals) const
 
 void Model::updatePosition(Point3d p)
 {
-	const Point3d bounds = boundsMax - boundsMin;
-	const qreal scale = scale / qMax(bounds.x, qMax(bounds.y, bounds.z));
-	for (int i = 0; i < m_points.size(); ++i)
-		m_points[i] = (m_points[i] + p - (boundsMin + bounds * 0.5)) * scale;
 
-	m_normals.resize(m_points.size());
-	for (int i = 0; i < m_pointIndices.size(); i += 3) {
-		const Point3d a = m_points.at(m_pointIndices.at(i));
-		const Point3d b = m_points.at(m_pointIndices.at(i + 1));
-		const Point3d c = m_points.at(m_pointIndices.at(i + 2));
+	if (!(p == position))
+	{
+		const Point3d bounds = boundsMax - boundsMin;
+		const qreal scale = this->scale / qMax(bounds.x, qMax(bounds.y, bounds.z));
+		for (int i = 0; i < m_points.size(); ++i)
+			m_target_points[i] = (m_points[i] + p - (boundsMin + bounds * 0.5)) * scale;
 
-		const Point3d normal = cross(b - a, c - a).normalize();
+		m_target_normals.resize(m_points.size());
+		for (int i = 0; i < m_pointIndices.size(); i += 3) {
+			const Point3d a = m_points.at(m_pointIndices.at(i));
+			const Point3d b = m_points.at(m_pointIndices.at(i + 1));
+			const Point3d c = m_points.at(m_pointIndices.at(i + 2));
 
-		for (int j = 0; j < 3; ++j)
-			m_normals[m_pointIndices.at(i + j)] += normal;
+			const Point3d normal = cross(b - a, c - a).normalize();
+
+			for (int j = 0; j < 3; ++j)
+				m_target_normals[m_pointIndices.at(i + j)] += normal;
+		}
+
+		for (int i = 0; i < m_target_normals.size(); ++i)
+			m_target_normals[i] = m_target_normals[i].normalize();
+
+		position = p;
 	}
-
-	for (int i = 0; i < m_normals.size(); ++i)
-		m_normals[i] = m_normals[i].normalize();
 }

@@ -22,14 +22,20 @@ public:
 	int points() const { return m_points.size(); }
 
 	void updatePosition(Point3d);
-
+	void updateRotation(Point3d);
 private:
 	Point3d boundsMin;
 	Point3d boundsMax;
 	int scale;
 	QString m_fileName;
+
+	Point3d position;
+	Point3d normal;
+
 	QVector<Point3d> m_points;
 	QVector<Point3d> m_normals;
+	QVector<Point3d> m_target_points;
+	QVector<Point3d> m_target_normals;
 	QVector<int> m_edgeIndices;
 	QVector<int> m_pointIndices;
 };

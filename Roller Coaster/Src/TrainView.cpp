@@ -177,23 +177,31 @@ void TrainView::paintGL()
 	//*********************************************************************
 	glEnable(GL_LIGHTING);
 	setupObjects();
-
 	drawStuff();
+
+	static int i = 0;
+	i > 1600 ? i = 0 : i += 2;
+	arrow->updatePosition(Point3d(80 - i / 10.f, 10.f, 0.f));
+	arrow->render(false, false);
+
+
 	// this time drawing is for shadows (except for top view)
 	if (this->camera != 1) {
 		setupShadows();
 		drawStuff(true);
 		unsetupShadows();
-	}
+	} 
 
 	//Get modelview matrix
  	glGetFloatv(GL_MODELVIEW_MATRIX,ModelViewMatrex);
 	//Get projection matrix
  	glGetFloatv(GL_PROJECTION_MATRIX,ProjectionMatrex);
 
+	
 	//Call triangle's render function, pass ModelViewMatrex and ProjectionMatrex
  	triangle->Paint(ProjectionMatrex,ModelViewMatrex);
-    
+	
+
 	//we manage textures by Trainview class, so we modify square's render function
 	square->Begin();
 		//Active Texture
@@ -207,10 +215,9 @@ void TrainView::paintGL()
 	square->End();
 
 	// Particle 特效
-	this->ProcessParticles();
+	// this->ProcessParticles();
 	this->DrawParticles();
 
-	arrow->render(false, false);
 
 }
 
