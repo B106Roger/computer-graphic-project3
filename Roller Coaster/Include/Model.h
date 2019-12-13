@@ -22,7 +22,7 @@ public:
 	int points() const { return m_points.size(); }
 
 	void updatePosition(Point3d);
-	void updateRotation(Point3d);
+	void updateRotation(float, Point3d);
 private:
 	Point3d boundsMin;
 	Point3d boundsMax;

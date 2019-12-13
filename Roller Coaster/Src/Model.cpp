@@ -124,13 +124,42 @@ void Model::render(bool wireframe, bool normals) const
 
 void Model::updatePosition(Point3d p)
 {
-
 	if (!(p == position))
 	{
 		const Point3d bounds = boundsMax - boundsMin;
 		const qreal scale = this->scale / qMax(bounds.x, qMax(bounds.y, bounds.z));
+
 		for (int i = 0; i < m_points.size(); ++i)
 			m_target_points[i] = (m_points[i] + p - (boundsMin + bounds * 0.5)) * scale;
+
+		m_target_normals.resize(m_points.size());
+		for (int i = 0; i < m_pointIndices.size(); i += 3) {
+			const Point3d a = m_points.at(m_pointIndices.at(i));
+			const Point3d b = m_points.at(m_pointIndices.at(i + 1));
+			const Point3d c = m_points.at(m_pointIndices.at(i + 2));
+
+			const Point3d normal = cross(b - a, c - a).normalize();
+
+			for (int j = 0; j < 3; ++j)
+				m_target_normals[m_pointIndices.at(i + j)] += normal;
+		}
+
+		for (int i = 0; i < m_target_normals.size(); ++i)
+			m_target_normals[i] = m_target_normals[i].normalize();
+
+		position = p;
+	}
+}
+
+void Model::updateRotation(float m, Point3d p)
+{
+	if (!(p == position))
+	{
+		const Point3d bounds = boundsMax - boundsMin;
+		const qreal scale = this->scale / qMax(bounds.x, qMax(bounds.y, bounds.z));
+
+		for (int i = 0; i < m_points.size(); ++i)
+			m_target_points[i] = (m_points[i].m(0,m-90,0) + p - (boundsMin + bounds * 0.5)) * scale;
 
 		m_target_normals.resize(m_points.size());
 		for (int i = 0; i < m_pointIndices.size(); i += 3) {

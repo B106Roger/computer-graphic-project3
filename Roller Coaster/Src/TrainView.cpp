@@ -4,13 +4,13 @@
 #include "AppMain.h"
 
 using namespace std;
-TrainView::TrainView(QWidget *parent) :  
-QGLWidget(parent)  
-{  
+TrainView::TrainView(QWidget *parent) :
+	QGLWidget(parent)
+{
 	resetArcball();
-}  
-TrainView::~TrainView()  
-{}  
+}
+TrainView::~TrainView()
+{}
 void TrainView::initializeGL()
 {
 
@@ -49,22 +49,22 @@ void TrainView::initializeGL()
 	// 火車速度
 	TRAIN_SPEED = 0.1f;
 	// 火車軌道曲線
-	vector<vector<float>> 
-	spline_Linear = 
+	vector<vector<float>>
+		spline_Linear =
 	{
 		{1,0,0,0},
 		{0,1,0,0},
 		{0,0,1,0},
 		{0,0,0,1},
 	},
-	spline_CardinalCubic = 
+	spline_CardinalCubic =
 	{
 		{    -0.5,   1, -0.5,       0},
 		{     1.5,-2.5,    0,       1},
 		{    -1.5,   2,  0.5,       0},
 		{     0.5,-0.5,    0,       0},
 	},
-	spline_CubicB_Spline = 
+	spline_CubicB_Spline =
 	{
 		{-1.f / 6, 0.5, -0.5, 1.f / 6},
 		{     0.5,  -1,    0, 2.f / 3},
@@ -81,8 +81,8 @@ void TrainView::initializeTexture()
 	QOpenGLTexture* texture = new QOpenGLTexture(QImage("./Textures/Tupi.bmp"));
 	Textures.push_back(texture);
 }
-void TrainView:: resetArcball()
-	//========================================================================
+void TrainView::resetArcball()
+//========================================================================
 {
 	// Set up the camera to look at the world
 	// these parameters might seem magical, and they kindof are
@@ -100,17 +100,17 @@ void TrainView::paintGL()
 	//**********************************************************************
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	// Set up the view port
-	glViewport(0,0,width(),height());
+	glViewport(0, 0, width(), height());
 	// clear the window, be sure to clear the Z-Buffer too
-	glClearColor(0,0,0.3f,0);
-	
+	glClearColor(0, 0, 0.3f, 0);
+
 	// we need to clear out the stencil buffer since we'll use
 	// it for shadows
 	glClearStencil(0);
 	glEnable(GL_DEPTH);
 
 	// Blayne prefers GL_DIFFUSE
-    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 
 	// prepare for projection
 	glMatrixMode(GL_PROJECTION);
@@ -133,7 +133,8 @@ void TrainView::paintGL()
 	if (this->camera == 1) {
 		glDisable(GL_LIGHT1);
 		glDisable(GL_LIGHT2);
-	} else {
+	}
+	else {
 		glEnable(GL_LIGHT1);
 		glEnable(GL_LIGHT2);
 	}
@@ -143,13 +144,13 @@ void TrainView::paintGL()
 	// * set the light parameters
 	//
 	//**********************************************************************
-	GLfloat lightPosition1[]	= {0,1,1,0}; // {50, 200.0, 50, 1.0};
-	GLfloat lightPosition2[]	= {1, 0, 0, 0};
-	GLfloat lightPosition3[]	= {0, -1, 0, 0};
-	GLfloat yellowLight[]		= {0.5f, 0.5f, .1f, 1.0};
-	GLfloat whiteLight[]		= {1.0f, 1.0f, 1.0f, 1.0};
-	GLfloat blueLight[]			= {.1f,.1f,.3f,1.0};
-	GLfloat grayLight[]			= {.3f, .3f, .3f, 1.0};
+	GLfloat lightPosition1[] = { 0,1,1,0 }; // {50, 200.0, 50, 1.0};
+	GLfloat lightPosition2[] = { 1, 0, 0, 0 };
+	GLfloat lightPosition3[] = { 0, -1, 0, 0 };
+	GLfloat yellowLight[] = { 0.5f, 0.5f, .1f, 1.0 };
+	GLfloat whiteLight[] = { 1.0f, 1.0f, 1.0f, 1.0 };
+	GLfloat blueLight[] = { .1f,.1f,.3f,1.0 };
+	GLfloat grayLight[] = { .3f, .3f, .3f, 1.0 };
 
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition1);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, whiteLight);
@@ -168,7 +169,7 @@ void TrainView::paintGL()
 	//*********************************************************************
 	setupFloor();
 	glDisable(GL_LIGHTING);
-	drawFloor(200,10);
+	drawFloor(200, 10);
 
 
 	//*********************************************************************
@@ -179,9 +180,18 @@ void TrainView::paintGL()
 	setupObjects();
 	drawStuff();
 
-	static int i = 0;
-	i > 1600 ? i = 0 : i += 2;
-	arrow->updatePosition(Point3d(80 - i / 10.f, 10.f, 0.f));
+	static int /*i = 0,*/ d = 0, r = 400;
+	static bool flag = true;
+	//i > 800 ? i = 0 : i += 2;
+	d > 360 ? d = 0 : d += 2;
+
+
+	arrow->updateRotation(d, Point3d(r*cos(d* PI / 180.0) / 10.f, 10.f, -r * sin(d* PI / 180.0) / 10.f));
+
+	//arrow->updatePosition(Point3d(80 - i / 10.f, 10.f, 0.f));
+
+
+
 	arrow->render(false, false);
 
 
@@ -190,28 +200,28 @@ void TrainView::paintGL()
 		setupShadows();
 		drawStuff(true);
 		unsetupShadows();
-	} 
+	}
 
 	//Get modelview matrix
- 	glGetFloatv(GL_MODELVIEW_MATRIX,ModelViewMatrex);
+	glGetFloatv(GL_MODELVIEW_MATRIX, ModelViewMatrex);
 	//Get projection matrix
- 	glGetFloatv(GL_PROJECTION_MATRIX,ProjectionMatrex);
+	glGetFloatv(GL_PROJECTION_MATRIX, ProjectionMatrex);
 
-	
+
 	//Call triangle's render function, pass ModelViewMatrex and ProjectionMatrex
- 	triangle->Paint(ProjectionMatrex,ModelViewMatrex);
-	
+	triangle->Paint(ProjectionMatrex, ModelViewMatrex);
+
 
 	//we manage textures by Trainview class, so we modify square's render function
 	square->Begin();
-		//Active Texture
-		glActiveTexture(GL_TEXTURE0);
-		//Bind square's texture
-		Textures[0]->bind();
-		//pass texture to shader
-		square->shaderProgram->setUniformValue("Texture",0);
-		//Call square's render function, pass ModelViewMatrex and ProjectionMatrex
-		square->Paint(ProjectionMatrex,ModelViewMatrex);
+	//Active Texture
+	glActiveTexture(GL_TEXTURE0);
+	//Bind square's texture
+	Textures[0]->bind();
+	//pass texture to shader
+	square->shaderProgram->setUniformValue("Texture", 0);
+	//Call square's render function, pass ModelViewMatrex and ProjectionMatrex
+	square->Paint(ProjectionMatrex, ModelViewMatrex);
 	square->End();
 
 	// Particle 特效
@@ -235,16 +245,17 @@ setProjection()
 	float aspect = static_cast<float>(width()) / static_cast<float>(height());
 
 	// Check whether we use the world camp
-	if (this->camera == 0){
+	if (this->camera == 0) {
 		arcball.setProjection(false);
 		update();
-	// Or we use the top cam
-	}else if (this->camera == 1) {
+		// Or we use the top cam
+	}
+	else if (this->camera == 1) {
 		float wi, he;
 		if (aspect >= 1) {
 			wi = 110;
 			he = wi / aspect;
-		} 
+		}
 		else {
 			he = 110;
 			wi = he * aspect;
@@ -256,9 +267,9 @@ setProjection()
 		glOrtho(-wi, wi, -he, he, 200, -200);
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
-		glRotatef(-90,1,0,0);
+		glRotatef(-90, 1, 0, 0);
 		update();
-	} 
+	}
 	// Or do the train view or other view here
 	//####################################################################
 	// TODO: 
@@ -266,7 +277,7 @@ setProjection()
 	//####################################################################
 	else {
 #ifdef EXAMPLE_SOLUTION
-		trainCamView(this,aspect);
+		trainCamView(this, aspect);
 #endif
 		update();
 	}
@@ -290,9 +301,9 @@ void TrainView::drawStuff(bool doingShadows)
 	// don't draw the control points if you're driving 
 	// (otherwise you get sea-sick as you drive through them)
 	if (this->camera != 2) {
-		for(size_t i = 0; i < this->m_pTrack->points.size(); ++i) {
+		for (size_t i = 0; i < this->m_pTrack->points.size(); ++i) {
 			if (!doingShadows) {
-				if ( ((int) i) != selectedCube)
+				if (((int)i) != selectedCube)
 					glColor3ub(240, 60, 60);
 				else
 					glColor3ub(240, 240, 30);
@@ -310,201 +321,201 @@ void TrainView::drawStuff(bool doingShadows)
 
 	switch (type_spline)
 	{
-		case spline_Linear:
+	case spline_Linear:
+	{
+		for (size_t i = 0; i < m_pTrack->points.size(); ++i)
 		{
-			for (size_t i = 0; i < m_pTrack->points.size(); ++i)
-			{
-				Pnt3f cp_pos_p1 = m_pTrack->points[i].pos;
-				Pnt3f cp_pos_p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].pos;
-				// orient
-				Pnt3f cp_orient_p1 = m_pTrack->points[i].orient;
-				Pnt3f cp_orient_p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].orient;
+			Pnt3f cp_pos_p1 = m_pTrack->points[i].pos;
+			Pnt3f cp_pos_p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].pos;
+			// orient
+			Pnt3f cp_orient_p1 = m_pTrack->points[i].orient;
+			Pnt3f cp_orient_p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].orient;
 
 
 
-				float percent = 1.0f / DIVIDE_LINE;
-				float t = 0;
-				Pnt3f qt, qt0, qt1, qt2, orient_t, cross_t, previous_qt;
+			float percent = 1.0f / DIVIDE_LINE;
+			float t = 0;
+			Pnt3f qt, qt0, qt1, qt2, orient_t, cross_t, previous_qt;
 
-				// 用控制點求出內差點
+			// 用控制點求出內差點
+			qt = (1 - t) * cp_pos_p1 + t * cp_pos_p2;
+
+			previous_qt = qt;
+			for (size_t j = 0; j < DIVIDE_LINE; j++) {
+				// 處理軌道線條
+				qt0 = qt;
+				orient_t = (1 - t) * cp_orient_p1 + t * cp_orient_p2;
+
+				t += percent;
+
 				qt = (1 - t) * cp_pos_p1 + t * cp_pos_p2;
+				qt1 = qt;
 
-				previous_qt = qt;
-				for (size_t j = 0; j < DIVIDE_LINE; j++) {
-					// 處理軌道線條
-					qt0 = qt;
-					orient_t = (1 - t) * cp_orient_p1 + t * cp_orient_p2;
+				// 向左右延伸距離
+				orient_t.normalize();
+				cross_t = (qt1 - qt0) * orient_t;
+				cross_t.normalize();
+				cross_t = cross_t * 2.5f;
 
-					t += percent;
+				// 畫出兩側軌道
+				glLineWidth(3);
 
-					qt = (1 - t) * cp_pos_p1 + t * cp_pos_p2;
-					qt1 = qt;
+				if (!doingShadows) {
+					glColor3ub(32, 32, 64);
+				}
+				glBegin(GL_LINES);
+				glVertex3f(qt0.x + cross_t.x, qt0.y + cross_t.y, qt0.z + cross_t.z);
+				glVertex3f(qt1.x + cross_t.x, qt1.y + cross_t.y, qt1.z + cross_t.z);
 
-					// 向左右延伸距離
-					orient_t.normalize();
-					cross_t = (qt1 - qt0) * orient_t;
-					cross_t.normalize();
-					cross_t = cross_t * 2.5f;
+				glVertex3f(qt1.x - cross_t.x, qt1.y - cross_t.y, qt1.z - cross_t.z);
+				glVertex3f(qt0.x - cross_t.x, qt0.y - cross_t.y, qt0.z - cross_t.z);
+				glEnd();
 
-					// 畫出兩側軌道
-					glLineWidth(3);
-
+				// 畫出鐵軌板子
+				float dist = distance(previous_qt, qt0);
+				if (dist > RAIL_WIDTH * 2.f)
+				{
+					Pnt3f tangentP = (qt1 - qt0);
+					tangentP.normalize();
+					tangentP = qt0 + tangentP * RAIL_WIDTH;
 					if (!doingShadows) {
-						glColor3ub(32, 32, 64);
+						glColor3ub(255, 255, 255);
 					}
-					glBegin(GL_LINES);
+					glBegin(GL_POLYGON);
 					glVertex3f(qt0.x + cross_t.x, qt0.y + cross_t.y, qt0.z + cross_t.z);
-					glVertex3f(qt1.x + cross_t.x, qt1.y + cross_t.y, qt1.z + cross_t.z);
+					glVertex3f(tangentP.x + cross_t.x, tangentP.y + cross_t.y, tangentP.z + cross_t.z);
 
-					glVertex3f(qt1.x - cross_t.x, qt1.y - cross_t.y, qt1.z - cross_t.z);
+					glVertex3f(tangentP.x - cross_t.x, tangentP.y - cross_t.y, tangentP.z - cross_t.z);
 					glVertex3f(qt0.x - cross_t.x, qt0.y - cross_t.y, qt0.z - cross_t.z);
 					glEnd();
 
-					// 畫出鐵軌板子
-					float dist = distance(previous_qt, qt0);
-					if (dist > RAIL_WIDTH * 2.f)
-					{
-						Pnt3f tangentP = (qt1 - qt0);
-						tangentP.normalize();
-						tangentP = qt0 + tangentP * RAIL_WIDTH;
-						if (!doingShadows) {
-							glColor3ub(255, 255, 255);
-						}
-						glBegin(GL_POLYGON);
-						glVertex3f(qt0.x + cross_t.x, qt0.y + cross_t.y, qt0.z + cross_t.z);
-						glVertex3f(tangentP.x + cross_t.x, tangentP.y + cross_t.y, tangentP.z + cross_t.z);
-
-						glVertex3f(tangentP.x - cross_t.x, tangentP.y - cross_t.y, tangentP.z - cross_t.z);
-						glVertex3f(qt0.x - cross_t.x, qt0.y - cross_t.y, qt0.z - cross_t.z);
-						glEnd();
-
-						previous_qt = qt0;
-					}
-					glLineWidth(1);
+					previous_qt = qt0;
 				}
+				glLineWidth(1);
 			}
-			break;
 		}
-		default:
+		break;
+	}
+	default:
+	{
+		const vector<vector<float>> &M = M_curve[this->curve];
+		for (size_t i = 0; i < m_pTrack->points.size(); ++i)
 		{
-			const vector<vector<float>> &M = M_curve[this->curve];
-			for (size_t i = 0; i < m_pTrack->points.size(); ++i)
-			{
-				// position
-				const Pnt3f &cp_pos_p1 = m_pTrack->points[i].pos;
-				const Pnt3f &cp_pos_p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].pos;
-				const Pnt3f &cp_pos_p3 = m_pTrack->points[(i + 2) % m_pTrack->points.size()].pos;
-				const Pnt3f &cp_pos_p4 = m_pTrack->points[(i + 3) % m_pTrack->points.size()].pos;
-				// orient
-				const Pnt3f &cp_orient_p1 = m_pTrack->points[i].orient;
-				const Pnt3f &cp_orient_p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].orient;
-				const Pnt3f &cp_orient_p3 = m_pTrack->points[(i + 2) % m_pTrack->points.size()].orient;
-				const Pnt3f &cp_orient_p4 = m_pTrack->points[(i + 3) % m_pTrack->points.size()].orient;
-				
-				const vector<vector<float>> 
+			// position
+			const Pnt3f &cp_pos_p1 = m_pTrack->points[i].pos;
+			const Pnt3f &cp_pos_p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].pos;
+			const Pnt3f &cp_pos_p3 = m_pTrack->points[(i + 2) % m_pTrack->points.size()].pos;
+			const Pnt3f &cp_pos_p4 = m_pTrack->points[(i + 3) % m_pTrack->points.size()].pos;
+			// orient
+			const Pnt3f &cp_orient_p1 = m_pTrack->points[i].orient;
+			const Pnt3f &cp_orient_p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].orient;
+			const Pnt3f &cp_orient_p3 = m_pTrack->points[(i + 2) % m_pTrack->points.size()].orient;
+			const Pnt3f &cp_orient_p4 = m_pTrack->points[(i + 3) % m_pTrack->points.size()].orient;
+
+			const vector<vector<float>>
 				G = {
 					{cp_pos_p1.x,cp_pos_p2.x,cp_pos_p3.x,cp_pos_p4.x},
 					{cp_pos_p1.y,cp_pos_p2.y,cp_pos_p3.y,cp_pos_p4.y},
 					{cp_pos_p1.z,cp_pos_p2.z,cp_pos_p3.z,cp_pos_p4.z},
-				},
-				G_orient = {
-					{cp_orient_p1.x,cp_orient_p2.x,cp_orient_p3.x,cp_orient_p4.x},
-					{cp_orient_p1.y,cp_orient_p2.y,cp_orient_p3.y,cp_orient_p4.y},
-					{cp_orient_p1.z,cp_orient_p2.z,cp_orient_p3.z,cp_orient_p4.z},
-				};
+			},
+			G_orient = {
+				{cp_orient_p1.x,cp_orient_p2.x,cp_orient_p3.x,cp_orient_p4.x},
+				{cp_orient_p1.y,cp_orient_p2.y,cp_orient_p3.y,cp_orient_p4.y},
+				{cp_orient_p1.z,cp_orient_p2.z,cp_orient_p3.z,cp_orient_p4.z},
+			};
 
-				float percent = 1.0f / (DIVIDE_LINE);
-				float t = 0;
-				Pnt3f qt, qt0, qt1, qt2, orient_t, cross_t, previous_qt;
+			float percent = 1.0f / (DIVIDE_LINE);
+			float t = 0;
+			Pnt3f qt, qt0, qt1, qt2, orient_t, cross_t, previous_qt;
 
-				vector<vector<float>> 
+			vector<vector<float>>
 				T =
-				{
-					{0},
-					{0},
-					{0},
+			{
+				{0},
+				{0},
+				{0},
+				{1}
+			};
+			// 用控制點求出內差點
+			vector<vector<float>> qt_v = Multiply(G, Multiply(M, T));
+			qt = Pnt3f(qt_v[0][0], qt_v[1][0], qt_v[2][0]);
+
+
+			previous_qt = qt;
+			for (size_t j = 0; j < DIVIDE_LINE; j++)
+			{
+				// 處理軌道線條
+				T = {
+					{pow(t,3)},
+					{pow(t,2)},
+					{t},
 					{1}
 				};
-				// 用控制點求出內差點
-				vector<vector<float>> qt_v = Multiply(G, Multiply(M,T));
-				qt = Pnt3f(qt_v[0][0], qt_v[1][0], qt_v[2][0]);
+				qt_v = Multiply(G, Multiply(M, T));
+				qt0 = Pnt3f(qt_v[0][0], qt_v[1][0], qt_v[2][0]);
 
 
-				previous_qt = qt;
-				for (size_t j = 0; j < DIVIDE_LINE; j++) 
+				vector<vector<float>> orient_v = Multiply(G_orient, Multiply(M, T));
+				orient_t = Pnt3f(orient_v[0][0], orient_v[1][0], orient_v[2][0]);
+
+
+				t += percent;
+				T = {
+					{pow(t,3)},
+					{pow(t,2)},
+					{t},
+					{1}
+				};
+				qt_v = Multiply(G, Multiply(M, T));
+				qt1 = Pnt3f(qt_v[0][0], qt_v[1][0], qt_v[2][0]);
+
+				// 向左右延伸距離
+				orient_t.normalize();
+				cross_t = (qt1 - qt0) * orient_t;
+				cross_t.normalize();
+				cross_t = cross_t * 2.5f;
+
+				// 畫出兩側軌道
+				glLineWidth(3);
+
+				if (!doingShadows) {
+					glColor3ub(32, 32, 64);
+				}
+				glBegin(GL_LINES);
+				glVertex3f(qt0.x + cross_t.x, qt0.y + cross_t.y, qt0.z + cross_t.z);
+				glVertex3f(qt1.x + cross_t.x, qt1.y + cross_t.y, qt1.z + cross_t.z);
+
+				glVertex3f(qt1.x - cross_t.x, qt1.y - cross_t.y, qt1.z - cross_t.z);
+				glVertex3f(qt0.x - cross_t.x, qt0.y - cross_t.y, qt0.z - cross_t.z);
+				glEnd();
+
+				// 畫出鐵軌板子
+				float dist = distance(previous_qt, qt0);
+				if (dist > RAIL_WIDTH * 2.f)
 				{
-					// 處理軌道線條
-					T = {
-						{pow(t,3)},
-						{pow(t,2)},
-						{t},
-						{1}
-					};
-					qt_v = Multiply(G, Multiply(M, T));
-					qt0 = Pnt3f(qt_v[0][0], qt_v[1][0], qt_v[2][0]);
-
-
-					vector<vector<float>> orient_v = Multiply(G_orient, Multiply(M, T));
-					orient_t = Pnt3f(orient_v[0][0], orient_v[1][0], orient_v[2][0]);
-
-
-					t += percent;
-					T = {
-						{pow(t,3)},
-						{pow(t,2)},
-						{t},
-						{1}
-					};
-					qt_v = Multiply(G, Multiply(M, T));
-					qt1 = Pnt3f(qt_v[0][0], qt_v[1][0], qt_v[2][0]);
-
-					// 向左右延伸距離
-					orient_t.normalize();
-					cross_t = (qt1 - qt0) * orient_t;
-					cross_t.normalize();
-					cross_t = cross_t * 2.5f;
-
-					// 畫出兩側軌道
-					glLineWidth(3);
-
+					Pnt3f tangentP = (qt1 - qt0);
+					tangentP.normalize();
+					tangentP = qt0 + tangentP * RAIL_WIDTH;
 					if (!doingShadows) {
-						glColor3ub(32, 32, 64);
+						glColor3ub(255, 255, 255);
 					}
-					glBegin(GL_LINES);
+					glBegin(GL_POLYGON);
 					glVertex3f(qt0.x + cross_t.x, qt0.y + cross_t.y, qt0.z + cross_t.z);
-					glVertex3f(qt1.x + cross_t.x, qt1.y + cross_t.y, qt1.z + cross_t.z);
+					glVertex3f(tangentP.x + cross_t.x, tangentP.y + cross_t.y, tangentP.z + cross_t.z);
 
-					glVertex3f(qt1.x - cross_t.x, qt1.y - cross_t.y, qt1.z - cross_t.z);
+					glVertex3f(tangentP.x - cross_t.x, tangentP.y - cross_t.y, tangentP.z - cross_t.z);
 					glVertex3f(qt0.x - cross_t.x, qt0.y - cross_t.y, qt0.z - cross_t.z);
 					glEnd();
 
-					// 畫出鐵軌板子
-					float dist = distance(previous_qt, qt0);
-					if (dist > RAIL_WIDTH * 2.f)
-					{
-						Pnt3f tangentP = (qt1 - qt0);
-						tangentP.normalize();
-						tangentP = qt0 + tangentP * RAIL_WIDTH;
-						if (!doingShadows) {
-							glColor3ub(255, 255, 255);
-						}
-						glBegin(GL_POLYGON);
-						glVertex3f(     qt0.x + cross_t.x,      qt0.y + cross_t.y,      qt0.z + cross_t.z);
-						glVertex3f(tangentP.x + cross_t.x, tangentP.y + cross_t.y, tangentP.z + cross_t.z);
-
-						glVertex3f(tangentP.x - cross_t.x, tangentP.y - cross_t.y, tangentP.z - cross_t.z);
-						glVertex3f(     qt0.x - cross_t.x,      qt0.y - cross_t.y,      qt0.z - cross_t.z);
-						glEnd();
-
-						previous_qt = qt0;
-					}
-					glLineWidth(1);
+					previous_qt = qt0;
 				}
+				glLineWidth(1);
 			}
-			break;
 		}
+		break;
 	}
-	
+	}
+
 
 
 #ifdef EXAMPLE_SOLUTION
@@ -518,7 +529,7 @@ void TrainView::drawStuff(bool doingShadows)
 	//####################################################################
 	AppMain::getInstance()->advanceTrain();
 	this->drawTrain(t_time);
-	
+
 	//tmp->render(false, false);
 
 
@@ -530,8 +541,8 @@ void TrainView::drawStuff(bool doingShadows)
 }
 
 void TrainView::
-	doPick(int mx, int my)
-	//========================================================================
+doPick(int mx, int my)
+//========================================================================
 {
 	// since we'll need to do some GL stuff so we make this window as 
 	// active window
@@ -542,9 +553,9 @@ void TrainView::
 	glGetIntegerv(GL_VIEWPORT, viewport);
 
 	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity ();
+	glLoadIdentity();
 
-	gluPickMatrix((double)mx, (double)(viewport[3]-my), 
+	gluPickMatrix((double)mx, (double)(viewport[3] - my),
 		5, 5, viewport);
 
 	// now set up the projection
@@ -552,15 +563,15 @@ void TrainView::
 
 	// now draw the objects - but really only see what we hit
 	GLuint buf[100];
-	glSelectBuffer(100,buf);
+	glSelectBuffer(100, buf);
 	glRenderMode(GL_SELECT);
 	glInitNames();
 	glPushName(0);
 
 
 	// draw the cubes, loading the names as we go
-	for(size_t i=0; i<m_pTrack->points.size(); ++i) {
-		glLoadName((GLuint) (i+1));
+	for (size_t i = 0; i < m_pTrack->points.size(); ++i) {
+		glLoadName((GLuint)(i + 1));
 		m_pTrack->points[i].draw();
 	}
 
@@ -571,8 +582,9 @@ void TrainView::
 		// are multiple objects, you really want to pick the closest
 		// one - see the OpenGL manual 
 		// remember: we load names that are one more than the index
-		selectedCube = buf[3]-1;
-	} else // nothing hit, nothing selected
+		selectedCube = buf[3] - 1;
+	}
+	else // nothing hit, nothing selected
 		selectedCube = -1;
 }
 
@@ -672,7 +684,7 @@ DeleteParticle(pParticle* p)
 	if (!(*p)->pPrev)//假如是首節點  
 	{
 		tmp = (*p);
-		*p = (*p)->pNext; 
+		*p = (*p)->pNext;
 		Particles = *p;
 		(*p)->pPrev = NULL;
 		delete tmp;
@@ -720,7 +732,7 @@ InitParticle(Particle& ep)
 		}
 		else
 		{
-			 ep.xspeed = -(rand() % int(-ep.xpos)) / 1500.0f;
+			ep.xspeed = -(rand() % int(-ep.xpos)) / 1500.0f;
 		}
 	}
 	ep.yspeed = 0.04f + float(rand() % 11) / 1000.0f;//y方向速度(向上)
@@ -902,7 +914,7 @@ drawTrain(float t)
 	const Pnt3f &cp_pos_p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].pos;
 	const Pnt3f &cp_pos_p3 = m_pTrack->points[(i + 2) % m_pTrack->points.size()].pos;
 	const Pnt3f &cp_pos_p4 = m_pTrack->points[(i + 3) % m_pTrack->points.size()].pos;
-	
+
 	// orient
 	const Pnt3f &cp_orient_p1 = m_pTrack->points[i].orient;
 	const Pnt3f &cp_orient_p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].orient;
@@ -926,20 +938,20 @@ drawTrain(float t)
 	spline_t type_spline = (spline_t)curve;
 	Pnt3f qt, qt0, qt1, orient_t, cross_t;
 	switch (type_spline) {
-		case spline_Linear:
-			// Linear
-			qt = (1 - t) * cp_pos_p1 + t * cp_pos_p2;
-			orient_t = (1 - t) * cp_orient_p1 + t * cp_orient_p2;
-			break;
+	case spline_Linear:
+		// Linear
+		qt = (1 - t) * cp_pos_p1 + t * cp_pos_p2;
+		orient_t = (1 - t) * cp_orient_p1 + t * cp_orient_p2;
+		break;
 
-		case spline_CardinalCubic:
-		case spline_CubicB_Spline:
-			T = { {pow(t,3)}, {pow(t,2)}, {t}, {1} };
-			tmp = Multiply(G_orient, Multiply(M, T));
-			orient_t = Pnt3f(tmp[0][0], tmp[1][0], tmp[2][0]);
-			tmp = Multiply(G, Multiply(M, T));
-			qt = Pnt3f(tmp[0][0], tmp[1][0], tmp[2][0]);
-			break;
+	case spline_CardinalCubic:
+	case spline_CubicB_Spline:
+		T = { {pow(t,3)}, {pow(t,2)}, {t}, {1} };
+		tmp = Multiply(G_orient, Multiply(M, T));
+		orient_t = Pnt3f(tmp[0][0], tmp[1][0], tmp[2][0]);
+		tmp = Multiply(G, Multiply(M, T));
+		qt = Pnt3f(tmp[0][0], tmp[1][0], tmp[2][0]);
+		break;
 	}
 	qt0 = qt;
 
@@ -972,13 +984,13 @@ drawTrain(float t)
 	qt1 = qt0 - cross_t;
 	qt0 = qt0 + cross_t;
 
-	
+
 	glBegin(GL_POLYGON);
 	glVertex3f(qt0.x, qt0.y, qt0.z);
 	glVertex3f(qt0.x + orient_t.x, qt0.y + orient_t.y, qt0.z + orient_t.z);
 
 	glVertex3f(qt1.x + orient_t.x, qt1.y + orient_t.y, qt1.z + orient_t.z);
-	glVertex3f(qt1.x, qt1.y, qt1.z );
+	glVertex3f(qt1.x, qt1.y, qt1.z);
 	glEnd();
 }
 

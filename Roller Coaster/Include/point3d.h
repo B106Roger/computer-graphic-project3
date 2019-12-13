@@ -5,6 +5,8 @@
 
 #include <QtCore/qglobal.h>
 
+#define PI 3.14159265
+
 struct Point3d
 {
 	float x, y, z;
@@ -37,6 +39,16 @@ struct Point3d
 	{
 		return Point3d(*this) *= f;
 	}
+
+	Point3d m(const float sX,const float sY, const float sZ)
+	{
+		float temp_x = x * (cos(sY* PI / 180.0)*cos(sZ* PI / 180.0) - sin(sX* PI / 180.0)*sin(sY* PI / 180.0)*sin(sZ* PI / 180.0)) + y * (-cos(sX* PI / 180.0)*sin(sZ* PI / 180.0)) + z * (sin(sY* PI / 180.0)*cos(sZ* PI / 180.0) + sin(sX* PI / 180.0)*cos(sY* PI / 180.0)*sin(sZ* PI / 180.0));
+		float temp_y = x * (cos(sY* PI / 180.0)*sin(sZ* PI / 180.0) + sin(sX* PI / 180.0)*sin(sY* PI / 180.0)*cos(sZ* PI / 180.0)) + y * (cos(sX* PI / 180.0)*cos(sZ* PI / 180.0)) + z * (sin(sY* PI / 180.0)*sin(sZ* PI / 180.0) - sin(sX* PI / 180.0)*cos(sY* PI / 180.0)*cos(sZ* PI / 180.0));
+		float temp_z = x * (-cos(sX* PI / 180.0)*sin(sY* PI / 180.0)) + y * (sin(sX* PI / 180.0)) + z * (cos(sX* PI / 180.0)*cos(sY* PI / 180.0));
+		return Point3d(temp_x, temp_y, temp_z);
+	}
+
+
 	Point3d &operator+=(const Point3d &p)
 	{
 		x += p.x;
@@ -55,7 +67,7 @@ struct Point3d
 
 	bool operator==(const Point3d &p)
 	{
-		if((x==p.x)&&(y==p.y)&&(z==p.z))
+		if ((x == p.x) && (y == p.y) && (z == p.z))
 			return true;
 		return false;
 	}
