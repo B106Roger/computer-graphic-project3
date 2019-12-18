@@ -15,14 +15,20 @@ void TrainView::initializeGL()
 {
 
 	initializeOpenGLFunctions();
+
 	//Create a triangle object
 	triangle = new Triangle();
-	//Initialize the triangle object
 	triangle->Init();
+
 	//Create a square object
 	square = new Square();
-	//Initialize the square object
 	square->Init();
+
+	//Create a water object
+	water = new Water();
+	water->Init();
+
+
 	//Initialize texture 
 	initializeTexture();
 	//Initialize music
@@ -208,8 +214,9 @@ void TrainView::paintGL()
 	glGetFloatv(GL_PROJECTION_MATRIX, ProjectionMatrex);
 
 
-	//Call triangle's render function, pass ModelViewMatrex and ProjectionMatrex
-	triangle->Paint(ProjectionMatrex, ModelViewMatrex);
+	// Call triangle's render function, pass ModelViewMatrex and ProjectionMatrex
+	// triangle->Paint(ProjectionMatrex, ModelViewMatrex);
+	water->Paint(ProjectionMatrex, ModelViewMatrex);
 
 
 	//we manage textures by Trainview class, so we modify square's render function

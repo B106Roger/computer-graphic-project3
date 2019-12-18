@@ -12,6 +12,7 @@
 #include "Triangle.h"
 #include "Square.h"
 #include "Model.h"
+#include "Water.h"
 
 class AppMain;
 class CTrack;
@@ -95,6 +96,7 @@ public:
 	vector<vector<vector<float>>> M_curve;
 
 	Triangle* triangle;
+	Water *water;
 	Square* square;
 	GLfloat ProjectionMatrex[16];
 	GLfloat ModelViewMatrex[16];

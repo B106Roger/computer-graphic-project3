@@ -1,5 +1,6 @@
 #include "Triangle.h"
-
+#include <iostream>
+using namespace std;
 Triangle::Triangle()
 {
 }
@@ -25,11 +26,13 @@ void Triangle::Paint(GLfloat* ProjectionMatrix, GLfloat* ModelViewMatrix)
 	shaderProgram->bind();
 	//Bind the VAO we want to draw
 	vao.bind();
-
+	clock_t utime = clock();
+	GLfloat t = utime / 1000.f;
 	//pass projection matrix to shader
 	shaderProgram->setUniformValue("ProjectionMatrix",P);
 	//pass modelview matrix to shader
 	shaderProgram->setUniformValue("ModelViewMatrix",MV);
+	shaderProgram->setUniformValue("time", t);
 
 	// Bind the buffer so that it is the current active buffer.
 	vvbo.bind();
@@ -41,26 +44,26 @@ void Triangle::Paint(GLfloat* ProjectionMatrix, GLfloat* ModelViewMatrix)
 	vvbo.release();
 
 	//Set each vertex's color
-	clock_t time = clock();
-	float color = sin(time / 1000.f);
-	colors.clear();
-	colors << QVector3D(0.0f, color, 0.0f)
-		<< QVector3D(color, 0.0f, 0.0f)
-		<< QVector3D(0.0f, 0.0f, color);
+	//clock_t time = clock();
+	//float color = sin(time / 1000.f);
+	//colors.clear();
+	//colors << QVector3D(0.0f, color, 0.0f)
+	//	<< QVector3D(color, 0.0f, 0.0f)
+	//	<< QVector3D(0.0f, 0.0f, color);
 
-	// Bind the buffer so that it is the current active buffer
-	cvbo.bind();
-	//// Allocate and initialize the information
-	cvbo.allocate(colors.constData(), colors.size() * sizeof(QVector3D));
-	// Enable Attribute 1
-	shaderProgram->enableAttributeArray(1);
-	// Set Attribute 0 to be color
-	shaderProgram->setAttributeArray(1,GL_FLOAT,0,3,NULL);
-	//unbind buffer
-	cvbo.release();
+	//// Bind the buffer so that it is the current active buffer
+	//cvbo.bind();
+	////// Allocate and initialize the information
+	//cvbo.allocate(colors.constData(), colors.size() * sizeof(QVector3D));
+	//// Enable Attribute 1
+	//shaderProgram->enableAttributeArray(1);
+	//// Set Attribute 0 to be color
+	//shaderProgram->setAttributeArray(1,GL_FLOAT,0,3,NULL);
+	////unbind buffer
+	//cvbo.release();
 
 	//Draw a triangle with 3 indices starting from the 0th index
-	glDrawArrays(GL_TRIANGLES,0,vertices.size());
+	glDrawArrays(GL_TRIANGLE_FAN,0,vertices.size());
 	//Disable Attribute 0&1
 	shaderProgram->disableAttributeArray(0);
 	shaderProgram->disableAttributeArray(1);
@@ -86,9 +89,10 @@ void Triangle::InitVAO()
 void Triangle::InitVBO()
 {
 	//Set each vertex's position
-	vertices<<QVector3D(5.0f, 2.0f, -10.0f)  
-			<<QVector3D(5.0f, 2.0f, 10.0f)  
-			<<QVector3D(15.0f, 2.0f, 0.0f);
+	vertices<<QVector3D(100.0f, 1.0f, 100.0f)
+			<<QVector3D(100.0f, 1.0f, -100.0f)
+			<<QVector3D(-100.0f, 1.0f, -100.0f)
+			<<QVector3D(-100.0f, 1.0f, 100.0f);
 	// Create Buffer for position
 	vvbo.create();
 	// Bind the buffer so that it is the current active buffer.

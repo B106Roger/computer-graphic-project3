@@ -23,6 +23,8 @@ void Square::Begin()
 }
 void Square::Paint(GLfloat* ProjectionMatrix, GLfloat* ModelViewMatrix)
 {
+	glPolygonMode(GL_FRONT, GL_LINE);
+	glPolygonMode(GL_BACK, GL_LINE);
 	GLfloat P[4][4];
 	GLfloat MV[4][4];
 	DimensionTransformation(ProjectionMatrix,P);
@@ -51,6 +53,8 @@ void Square::Paint(GLfloat* ProjectionMatrix, GLfloat* ModelViewMatrix)
 
 	//Draw triangles with 4 indices starting from the 0th index
 	glDrawArrays(GL_TRIANGLE_FAN,0,vertices.size());
+	glPolygonMode(GL_FRONT, GL_FILL);
+	glPolygonMode(GL_BACK, GL_FILL);
 }
 void Square::End()
 {
@@ -82,7 +86,15 @@ void Square::InitVBO()
 	vertices <<QVector3D(0.0f, 2.0f, -10.0f)  
 			<<QVector3D(0.0f, 2.0f, 10.0f)
 			<<QVector3D(-20.0f, 2.0f, 10.0f)
-			<<QVector3D(-20.0f, 2.0f, -10.0f);
+			<<QVector3D(-20.0f, 2.0f, -10.0f)
+			<< QVector3D(20.0f, 2.0f, -10.0f)
+			<< QVector3D(20.0f, 2.0f, 10.0f)
+			<< QVector3D(0.0f, 2.0f, 10.0f)
+			<< QVector3D(0.0f, 2.0f, -10.0f)
+		<< QVector3D(40.0f, 2.0f, -10.0f)
+		<< QVector3D(40.0f, 2.0f, 10.0f)
+		<< QVector3D(20.0f, 2.0f, 10.0f)
+		<< QVector3D(20.0f, 2.0f, -10.0f);
 	// Create Buffer for position
 	vvbo.create();
 	// Bind the buffer so that it is the current active buffer
