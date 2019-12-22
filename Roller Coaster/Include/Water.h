@@ -17,8 +17,8 @@ public:
 	QOpenGLShader* vertexShader;
 	QOpenGLShader* geometryShader;
 	QOpenGLShader* fragmentShader;
-	QVector<QVector3D> vertices;
-	QVector<QVector3D> colors;
+	QVector<QVector2D> vertices;
+	// QVector<QVector3D> colors;
 	QOpenGLVertexArrayObject vao;
 	QOpenGLBuffer vvbo;
 	QOpenGLBuffer cvbo;

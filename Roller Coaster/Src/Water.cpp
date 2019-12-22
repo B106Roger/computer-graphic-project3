@@ -44,20 +44,21 @@ void Water::Paint(GLfloat* ProjectionMatrix, GLfloat* ModelViewMatrix)
 	// Enable Attribute 0
 	shaderProgram->enableAttributeArray(0);
 	// Set Attribute 0 to be position
-	shaderProgram->setAttributeArray(0,GL_FLOAT,0,3,NULL);
+	shaderProgram->setAttributeArray(0,GL_FLOAT,0,2,NULL);
+	// 0: location; GL_FLOAT: 型別; 0: 從哪裡開始; 2: input vector維度; NULL: ?
 	//unbind buffer
 	vvbo.release();
 
 
-	cvbo.bind();
-	//// Allocate and initialize the information
-	cvbo.allocate(colors.constData(), colors.size() * sizeof(QVector3D));
-	// Enable Attribute 1
-	shaderProgram->enableAttributeArray(1);
-	// Set Attribute 0 to be color
-	shaderProgram->setAttributeArray(1,GL_FLOAT,0,3,NULL);
-	//unbind buffer
-	cvbo.release();
+	//cvbo.bind();
+	////// Allocate and initialize the information
+	//cvbo.allocate(colors.constData(), colors.size() * sizeof(QVector3D));
+	//// Enable Attribute 1
+	//shaderProgram->enableAttributeArray(1);
+	//// Set Attribute 0 to be color
+	//shaderProgram->setAttributeArray(1,GL_FLOAT,0,3,NULL);
+	////unbind buffer
+	//cvbo.release();
 
 
 	//Draw a triangle with 3 indices starting from the 0th index
@@ -99,13 +100,13 @@ void Water::InitVBO()
 		for (float x = -size / 2; x < size / 2; x += side)
 		{
 			vertices
-				<< QVector3D(x + side,3.f /* sin(DISTANCE(x + side, y - side) / a) * wave + wave*/, y - side)
-				<< QVector3D(x + side,3.f /*sin(DISTANCE(x + side, y) / a) * wave + wave*/, y)
-				<< QVector3D(x, 3.f/*sin(DISTANCE(x, y) / a) * wave + wave*/, y)
+				<< QVector2D(x + side, y - side)
+				<< QVector2D(x + side, y)
+				<< QVector2D(x, y)
 
-				<< QVector3D(x, 3.f/*sin(DISTANCE(x, y) / a) * wave + wave*/, y)
-				<< QVector3D(x, 3.f/*sin(DISTANCE(x, y - side) / a) * wave + wave*/, y - side)
-				<< QVector3D(x + side, 3.f/*sin(DISTANCE(x + side, y - side) / a) * wave + wave*/, y - side);
+				<< QVector2D(x, y)
+				<< QVector2D(x, y - side)
+				<< QVector2D(x + side, y - side);
 		}
 	}
 
@@ -117,20 +118,20 @@ void Water::InitVBO()
 	// Since we will never change the data that we are about to pass the Buffer, we will say that the Usage Pattern is StaticDraw
 	vvbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
 	// Allocate and initialize the information
-	vvbo.allocate(vertices.constData(),vertices.size() * sizeof(QVector3D));
+	vvbo.allocate(vertices.constData(),vertices.size() * sizeof(QVector2D));
 
 	//Set each vertex's color
 	/*colors<<QVector3D(0.0f,1.0f,0.0f)
 		  <<QVector3D(0.0f,1.0f,0.0f)
 		  <<QVector3D(0.0f,1.0f,0.0f);*/
 	// Create Buffer for color
-	cvbo.create();
-	// Bind the buffer so that it is the current active buffer.
-	cvbo.bind();
-	// Since we will never change the data that we are about to pass the Buffer, we will say that the Usage Pattern is StaticDraw
-	cvbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
-	// Allocate and initialize the information
-	cvbo.allocate(colors.constData(),colors.size() * sizeof(QVector3D));
+	//cvbo.create();
+	//// Bind the buffer so that it is the current active buffer.
+	//cvbo.bind();
+	//// Since we will never change the data that we are about to pass the Buffer, we will say that the Usage Pattern is StaticDraw
+	//cvbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
+	//// Allocate and initialize the information
+	//cvbo.allocate(colors.constData(),colors.size() * sizeof(QVector3D));
 
 }
 void Water::InitShader(QString vertexShaderPath,QString fragmentShaderPath,QString geomoetryShaderPath)
