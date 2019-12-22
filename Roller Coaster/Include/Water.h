@@ -15,6 +15,7 @@ class Water
 public:
 	QOpenGLShaderProgram* shaderProgram;
 	QOpenGLShader* vertexShader;
+	QOpenGLShader* geometryShader;
 	QOpenGLShader* fragmentShader;
 	QVector<QVector3D> vertices;
 	QVector<QVector3D> colors;
@@ -22,7 +23,7 @@ public:
 	QOpenGLBuffer vvbo;
 	QOpenGLBuffer cvbo;
 
-	int size;
+	float size;
 	int numberOfSquare;
 
 public:
@@ -30,7 +31,7 @@ public:
 	void Init();
 	void InitVAO();
 	void InitVBO();
-	void InitShader(QString vertexShaderPath,QString fragmentShaderPath);
+	void InitShader(QString vertexShaderPath,QString fragmentShaderPath, QString geomoetryShaderPath);
 	void Paint(GLfloat* ProjectionMatrix, GLfloat* ModelViewMatrix);
 	void DimensionTransformation(GLfloat source[],GLfloat target[][4]);
 };

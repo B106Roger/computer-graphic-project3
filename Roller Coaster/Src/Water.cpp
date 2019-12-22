@@ -4,7 +4,7 @@ using namespace std;
 Water::Water()
 {
 	size = 200;
-	numberOfSquare = 200;
+	numberOfSquare = 400;
 }
 void Water::DimensionTransformation(GLfloat source[],GLfloat target[][4])
 {
@@ -36,6 +36,7 @@ void Water::Paint(GLfloat* ProjectionMatrix, GLfloat* ModelViewMatrix)
 	shaderProgram->setUniformValue("proj_matrix",P);
 	//pass modelview matrix to shader
 	shaderProgram->setUniformValue("model_matrix",MV);
+	//pass time to shader
 	shaderProgram->setUniformValue("time", t);
 
 	// Bind the buffer so that it is the current active buffer.
@@ -73,7 +74,7 @@ void Water::Paint(GLfloat* ProjectionMatrix, GLfloat* ModelViewMatrix)
 }
 void Water::Init()
 {
-	InitShader("./Shader/Water.vs","./Shader/Water.fs");
+	InitShader("./Shader/Water.vs","./Shader/Water.fs", "./Shader/Water.gs");
 	InitVAO();
 	InitVBO();
 }
@@ -88,47 +89,25 @@ void Water::InitVAO()
 void Water::InitVBO()
 {
 	//Set each vertex's position
-	int side = size / numberOfSquare;
-	int initial_X = -size / 2, initial_Y = size / 2;
+	float side = size / numberOfSquare;
+	float initial_X = -size / 2, initial_Y = size / 2;
 	float time = clock() / 1000.f;
-
-
-		for (int y = size / 2; y > -size / 2; y -= side)
+	for (float y = size / 2; y > -size / 2; y -= side)
+	{
+		float wave = 2.f;
+		float a = 5.f;
+		for (float x = -size / 2; x < size / 2; x += side)
 		{
-			int i = 0;
-			float wave = 5.f;
-			float a = 5.f;
-			for (int x = -size / 2; x < size / 2; x += side)
-			{
-				//int height = sin(DISTANCE(x + side / 2, y - side /2)) * 2 + 2;
-				vertices
-					<< QVector3D(x + side, sin(DISTANCE(x + side, y - side) / a) * wave + wave, y - side)
-					<< QVector3D(x + side, sin(DISTANCE(x + side, y) / a) * wave + wave, y)
-					<< QVector3D(x, sin(DISTANCE(x, y) / a) * wave + wave, y)
+			vertices
+				<< QVector3D(x + side,3.f /* sin(DISTANCE(x + side, y - side) / a) * wave + wave*/, y - side)
+				<< QVector3D(x + side,3.f /*sin(DISTANCE(x + side, y) / a) * wave + wave*/, y)
+				<< QVector3D(x, 3.f/*sin(DISTANCE(x, y) / a) * wave + wave*/, y)
 
-					<< QVector3D(x, sin(DISTANCE(x, y) / a) * wave + wave, y)
-					<< QVector3D(x, sin(DISTANCE(x, y - side) / a) * wave + wave, y - side)
-					<< QVector3D(x + side, sin(DISTANCE(x + side, y - side) / a) * wave + wave, y - side);
-
-				QVector3D normal1 = QVector3D::crossProduct(
-					QVector3D(x + side, sin(DISTANCE(x + side, y) / a) * wave + wave, y) - QVector3D(x + side, sin(DISTANCE(x + side, y - side) / a) * wave + wave, y - side),
-					QVector3D(x + side, sin(DISTANCE(x + side, y) / a) * wave + wave, y) - QVector3D(x, sin(DISTANCE(x, y) / a) * wave + wave, y)
-				);
-				QVector3D normal2 = QVector3D::crossProduct(
-					QVector3D(x, sin(DISTANCE(x, y - side) / a) * wave + wave, y - side) - QVector3D(x, sin(DISTANCE(x, y) / a) * wave + wave, y),
-					QVector3D(x, sin(DISTANCE(x, y - side) / a) * wave + wave, y - side) - QVector3D(x + side, sin(DISTANCE(x + side, y - side) / a) * wave + wave, y - side)
-				);
-				normal1.normalize();
-				normal2.normalize();
-				colors
-					<< normal1
-					<< normal1
-					<< normal1
-					<< normal2
-					<< normal2
-					<< normal2;
-			}
+				<< QVector3D(x, 3.f/*sin(DISTANCE(x, y) / a) * wave + wave*/, y)
+				<< QVector3D(x, 3.f/*sin(DISTANCE(x, y - side) / a) * wave + wave*/, y - side)
+				<< QVector3D(x + side, 3.f/*sin(DISTANCE(x + side, y - side) / a) * wave + wave*/, y - side);
 		}
+	}
 
 	
 	// Create Buffer for position
@@ -154,8 +133,9 @@ void Water::InitVBO()
 	cvbo.allocate(colors.constData(),colors.size() * sizeof(QVector3D));
 
 }
-void Water::InitShader(QString vertexShaderPath,QString fragmentShaderPath)
+void Water::InitShader(QString vertexShaderPath,QString fragmentShaderPath,QString geomoetryShaderPath)
 {
+
 	// Create Shader
 	shaderProgram = new QOpenGLShaderProgram();
 	QFileInfo  vertexShaderFile(vertexShaderPath);
@@ -169,6 +149,18 @@ void Water::InitShader(QString vertexShaderPath,QString fragmentShaderPath)
 	}
 	else
 		qDebug()<<vertexShaderFile.filePath()<<" can't be found";
+
+	QFileInfo  geometryShaderFile(geomoetryShaderPath);
+	if (geometryShaderFile.exists())
+	{
+		geometryShader = new QOpenGLShader(QOpenGLShader::Geometry);
+		if (geometryShader->compileSourceFile(geomoetryShaderPath))
+			shaderProgram->addShader(geometryShader);
+		else
+			qWarning() << "Geometry Shader Error " << geometryShader->log();
+	}
+	else
+		qDebug() << geometryShaderFile.filePath() << " can't be found";
 
 	QFileInfo  fragmentShaderFile(fragmentShaderPath);
 	if(fragmentShaderFile.exists())

@@ -175,8 +175,8 @@ void TrainView::paintGL()
 	//*********************************************************************
 	setupFloor();
 	glDisable(GL_LIGHTING);
-	drawFloor(200, 10);
-
+	//drawFloor(200, 10);
+	
 
 	//*********************************************************************
 	// now draw the object and we need to do it twice
@@ -217,7 +217,6 @@ void TrainView::paintGL()
 	// Call triangle's render function, pass ModelViewMatrex and ProjectionMatrex
 	// triangle->Paint(ProjectionMatrex, ModelViewMatrex);
 	water->Paint(ProjectionMatrex, ModelViewMatrex);
-
 
 	//we manage textures by Trainview class, so we modify square's render function
 	square->Begin();

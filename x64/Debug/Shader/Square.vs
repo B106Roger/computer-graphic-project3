@@ -5,11 +5,12 @@ layout(location = 1) in vec2 uv;
 
 uniform mat4 ProjectionMatrix;
 uniform mat4 ModelViewMatrix;
-
+uniform int t;
 out vec2 vUV;
 
 void main(void)
 {
-    gl_Position = ProjectionMatrix * ModelViewMatrix * vec4(vertex, 1.0);
+	vec3 v = vec3(vertex.x, sqrt(vertex.x*vertex.x+vertex.z*vertex.z), vertex.z);
+    gl_Position = ProjectionMatrix * ModelViewMatrix * vec4(v, 1.0);
     vUV = uv;
 }

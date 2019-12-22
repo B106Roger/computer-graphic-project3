@@ -34,6 +34,9 @@ void Square::Paint(GLfloat* ProjectionMatrix, GLfloat* ModelViewMatrix)
 	//pass modelview matrix to shader
 	shaderProgram->setUniformValue("ModelViewMatrix",MV);
 
+	clock_t utime = clock();
+	GLint t = utime / 1000.f;
+	shaderProgram->setUniformValue("t", t);
 	// Bind the buffer so that it is the current active buffer
 	vvbo.bind();
 	// Enable Attribute 0
