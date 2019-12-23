@@ -176,7 +176,13 @@ void TrainView::paintGL()
 	setupFloor();
 	glDisable(GL_LIGHTING);
 	//drawFloor(200, 10);
-	
+	//Get modelview matrix
+	glGetFloatv(GL_MODELVIEW_MATRIX, ModelViewMatrex);
+	//Get projection matrix
+	glGetFloatv(GL_PROJECTION_MATRIX, ProjectionMatrex);
+	// Call triangle's render function, pass ModelViewMatrex and ProjectionMatrex
+	// triangle->Paint(ProjectionMatrex, ModelViewMatrex);
+	water->Paint(ProjectionMatrex, ModelViewMatrex);
 
 	//*********************************************************************
 	// now draw the object and we need to do it twice
@@ -186,19 +192,10 @@ void TrainView::paintGL()
 	setupObjects();
 	drawStuff();
 
-	static int /*i = 0,*/ d = 0, r = 400;
-	static bool flag = true;
-	//i > 800 ? i = 0 : i += 2;
-	d > 360 ? d = 0 : d += 2;
+	
 
 
-	arrow->updateRotation(d, Point3d(r*cos(d* PI / 180.0) / 10.f, 10.f, -r * sin(d* PI / 180.0) / 10.f));
-
-	//arrow->updatePosition(Point3d(80 - i / 10.f, 10.f, 0.f));
-
-
-
-	arrow->render(false, false);
+	
 
 
 	// this time drawing is for shadows (except for top view)
@@ -208,15 +205,7 @@ void TrainView::paintGL()
 		unsetupShadows();
 	}
 
-	//Get modelview matrix
-	glGetFloatv(GL_MODELVIEW_MATRIX, ModelViewMatrex);
-	//Get projection matrix
-	glGetFloatv(GL_PROJECTION_MATRIX, ProjectionMatrex);
-
-
-	// Call triangle's render function, pass ModelViewMatrex and ProjectionMatrex
-	// triangle->Paint(ProjectionMatrex, ModelViewMatrex);
-	water->Paint(ProjectionMatrex, ModelViewMatrex);
+	
 
 	//we manage textures by Trainview class, so we modify square's render function
 	square->Begin();
@@ -536,6 +525,11 @@ void TrainView::drawStuff(bool doingShadows)
 	AppMain::getInstance()->advanceTrain();
 	this->drawTrain(t_time);
 
+	static int d = 0, r = 400;
+	static bool flag = true;
+	d > 360 ? d = 0 : d += 2;
+	arrow->updateRotation(d, Point3d(r*cos(d* PI / 180.0) / 10.f, 10.f, -r * sin(d* PI / 180.0) / 10.f));
+	arrow->render(false, false);
 	//tmp->render(false, false);
 
 
