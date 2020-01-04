@@ -45,7 +45,7 @@ void TrainView::initializeGL()
 	DIVIDE_LINE = 80;
 	RAIL_WIDTH = 3.f;
 	// 其他物件
-	arrow = new Model(QStringLiteral(":/Object/Resources/Object/Transport_Shuttle_obj.obj"), 20, Point3d(-6.f, 10.f, 3.f));
+	spaceShip = new Model(QStringLiteral(":/Object/Resources/Object/Transport_Shuttle_obj.obj"), 20, Point3d(-6.f, 10.f, 3.f));
 	//tmp = new Model(QStringLiteral(":/Object/Resources/object/arrow.obj"), 100, Point3d(0.f, 0.f, 3.f));
 
 	// 初始化火車時間
@@ -98,7 +98,7 @@ void TrainView::resetArcball()
 
 void TrainView::paintGL()
 {
-
+	this->printFPS();
 	//*********************************************************************
 	//
 	// * Set up basic opengl informaiton
@@ -173,16 +173,20 @@ void TrainView::paintGL()
 	//*********************************************************************
 	// now draw the ground plane
 	//*********************************************************************
-	setupFloor();
-	glDisable(GL_LIGHTING);
-	//drawFloor(200, 10);
 	//Get modelview matrix
 	glGetFloatv(GL_MODELVIEW_MATRIX, ModelViewMatrex);
 	//Get projection matrix
 	glGetFloatv(GL_PROJECTION_MATRIX, ProjectionMatrex);
+
+	setupFloor();
+	glDisable(GL_LIGHTING);
+	water->Paint(ProjectionMatrex, ModelViewMatrex);
+	// drawFloor(200, 10);
+
+
 	// Call triangle's render function, pass ModelViewMatrex and ProjectionMatrex
 	// triangle->Paint(ProjectionMatrex, ModelViewMatrex);
-	water->Paint(ProjectionMatrex, ModelViewMatrex);
+
 
 	//*********************************************************************
 	// now draw the object and we need to do it twice
@@ -191,11 +195,6 @@ void TrainView::paintGL()
 	glEnable(GL_LIGHTING);
 	setupObjects();
 	drawStuff();
-
-	
-
-
-	
 
 
 	// this time drawing is for shadows (except for top view)
@@ -525,11 +524,12 @@ void TrainView::drawStuff(bool doingShadows)
 	AppMain::getInstance()->advanceTrain();
 	this->drawTrain(t_time);
 
-	static int d = 0, r = 400;
-	static bool flag = true;
-	d > 360 ? d = 0 : d += 2;
-	arrow->updateRotation(d, Point3d(r*cos(d* PI / 180.0) / 10.f, 10.f, -r * sin(d* PI / 180.0) / 10.f));
-	arrow->render(false, false);
+	static float d = 0, r = 400;
+	static Point3d rotation(0, 0, 0);
+	d > 360.f ? d = 0.f : d += 0.1;
+	rotation.y = d - 90;
+	spaceShip->updateRotation(rotation, Point3d(r * cos(d *  PI / 180.0) / 10.f, 10.f, -r * sin(d * PI / 180.0) / 10.f));
+	spaceShip->render(false, false);
 	//tmp->render(false, false);
 
 
@@ -1016,4 +1016,20 @@ vector<vector<float>> Multiply(const vector<vector<float>> &m1, const vector<vec
 		}
 	}
 	return result;
+}
+
+void TrainView::printFPS()
+{
+	static float framesPerSecond = 0.0f;
+	static int fps;
+	static float lastTime = 0.0f;
+	float currentTime = GetTickCount() * 0.001f;
+	++framesPerSecond;
+	//printf("FPS: %d\n\n", fps);
+	if (currentTime - lastTime > 1.0f)
+	{
+		lastTime = currentTime;
+		fps = (int)framesPerSecond;
+		framesPerSecond = 0;
+	}
 }

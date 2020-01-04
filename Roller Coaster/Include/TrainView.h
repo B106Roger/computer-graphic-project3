@@ -82,7 +82,7 @@ public:
 	void initializeGL();
 	void initializeTexture();
 	void initializeMedia();
-
+	void printFPS();
 
 public:
 	ArcBallCam		arcball;			// keep an ArcBall for the UI
@@ -108,11 +108,10 @@ public:
 	float TRAIN_SPEED;
 	void drawTrain(float);
 	
-	
 	// **********************************
 	// ********** 其他小物件   **********
 	// **********************************
-	Model *arrow;
+	Model *spaceShip;
 	Model *tmp;
 
 	// **********************************

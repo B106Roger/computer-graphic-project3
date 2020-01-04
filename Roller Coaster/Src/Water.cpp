@@ -19,8 +19,6 @@ void Water::DimensionTransformation(GLfloat source[],GLfloat target[][4])
 }
 void Water::Paint(GLfloat* ProjectionMatrix, GLfloat* ModelViewMatrix)
 {
-	//glPolygonMode(GL_FRONT, GL_LINE);
-	//glPolygonMode(GL_BACK, GL_LINE);
 	GLfloat P[4][4];
 	GLfloat MV[4][4];
 	DimensionTransformation(ProjectionMatrix,P);

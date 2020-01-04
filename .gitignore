@@ -45,3 +45,10 @@ target_wrapper.*
 
 # QtCreator CMake
 CMakeLists.txt.user*
+*.vspx
+Roller Coaster1.psess
+Roller Coaster.psess
+*.log
+*.log
+*.pdb
+Roller Coaster/x64/Debug/vc141.pdb
