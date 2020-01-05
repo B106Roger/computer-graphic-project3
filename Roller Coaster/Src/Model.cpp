@@ -10,17 +10,6 @@ bool Model::firstInitShader = false;
 QOpenGLShader*  Model::vertexShader = NULL;
 QOpenGLShader*  Model::geometryShader = NULL;
 QOpenGLShader*  Model::fragmentShader = NULL;
-void DimensionTransformation(GLfloat source[], GLfloat target[][4])
-{
-	//for uniform value, transfer 1 dimension to 2 dimension
-	int i = 0;
-	for (int j = 0; j < 4; j++)
-		for (int k = 0; k < 4; k++)
-		{
-			target[j][k] = source[i];
-			i++;
-		}
-}
 
 Model::Model(const QString &filePath, int s, Point3d p)
 	: m_fileName(QFileInfo(filePath).fileName())
@@ -101,7 +90,7 @@ Model::Model(const QString &filePath, int s, Point3d p)
 	Init();
 }
 
-void Model::render(bool wireframe, bool normals)
+void Model::render(GLfloat P[][4], GLfloat MV[][4], bool wireframe, bool normals)
 {
 	glEnable(GL_DEPTH_TEST);
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -117,17 +106,9 @@ void Model::render(bool wireframe, bool normals)
 		Point3d bounds = boundsMax - boundsMin;
 		Point3d boundedContant = (boundsMin + bounds * 0.5);
 		GLfloat boundScale = this->scale / qMax(bounds.x, qMax(bounds.y, bounds.z));
-		GLfloat P[4][4];
-		GLfloat MV[4][4];
-		GLfloat ModelViewMatix[16], ProjectionMatrix[16];
 		QVector3D inputPos = { position.x, position.y, position.z };
 		QVector3D inputRot = { rotation.x, rotation.y, rotation.z };
 		QVector3D inputConst = { boundedContant.x,boundedContant.y,boundedContant.z };
-		glGetFloatv(GL_MODELVIEW_MATRIX, ModelViewMatix);
-		glGetFloatv(GL_PROJECTION_MATRIX, ProjectionMatrix);
-		DimensionTransformation(ProjectionMatrix, P);
-		DimensionTransformation(ModelViewMatix, MV);
-
 
 		shaderProgram->bind();
 		//Bind the VAO we want to draw

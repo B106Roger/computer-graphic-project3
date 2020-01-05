@@ -35,6 +35,12 @@
     <Filter Include="Header Files\Utilities">
       <UniqueIdentifier>{2ec37186-5191-4bbe-99cb-cae9dd6569c6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Object">
+      <UniqueIdentifier>{ae306855-09e2-437d-9c3f-00ed3748bf90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Object">
+      <UniqueIdentifier>{39a7aa06-730d-4468-ab4b-d46b894e8469}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GeneratedFiles\qrc_AppMain.cpp">
@@ -76,15 +82,6 @@
     <ClCompile Include="GeneratedFiles\Release\moc_TrainView.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Triangle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Square.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Model.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Src\CBMPLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -94,8 +91,23 @@
     <ClCompile Include="Src\vector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Water.cpp">
+    <ClCompile Include="TGATexture.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Water.cpp">
+      <Filter>Source Files\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Triangle.cpp">
+      <Filter>Source Files\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Square.cpp">
+      <Filter>Source Files\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Model.cpp">
+      <Filter>Source Files\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Skybox.cpp">
+      <Filter>Source Files\Object</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -125,19 +137,10 @@
     <ClInclude Include="Include\Track.H">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Triangle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\Square.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Include\3DSLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\CbmpLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\Model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\point3d.h">
@@ -146,8 +149,23 @@
     <ClInclude Include="Include\vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Water.h">
+    <ClInclude Include="TGATexture.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Water.h">
+      <Filter>Header Files\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Triangle.h">
+      <Filter>Header Files\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Model.h">
+      <Filter>Header Files\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Square.h">
+      <Filter>Header Files\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Skybox.h">
+      <Filter>Header Files\Object</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

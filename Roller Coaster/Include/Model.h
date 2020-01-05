@@ -19,8 +19,7 @@ public:
 	Model() {}
 	Model(const QString &filePath, int s, Point3d p);
 
-	void render(bool wireframe = false, bool normals = false);
-
+	void render(GLfloat P[][4], GLfloat MV[][4], bool wireframe = false, bool normals = false);
 	QString fileName() const { return m_fileName; }
 	int faces() const { return m_pointIndices.size() / 3; }
 	int edges() const { return m_edgeIndices.size() / 2; }

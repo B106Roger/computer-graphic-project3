@@ -3,33 +3,18 @@
 using namespace std;
 Water::Water()
 {
-	size = 200;
-	numberOfSquare = 400;
+	size = 150;
+	numberOfSquare = 200;
 }
-void Water::DimensionTransformation(GLfloat source[],GLfloat target[][4])
-{
-	//for uniform value, transfer 1 dimension to 2 dimension
-	int i = 0;
-	for(int j=0;j<4;j++)
-		for(int k=0;k<4;k++)
-		{
-			target[j][k] = source[i];
-			i++;
-		}
-}
-void Water::Paint(GLfloat* ProjectionMatrix, GLfloat* ModelViewMatrix)
-{
-	GLfloat P[4][4];
-	GLfloat MV[4][4];
-	DimensionTransformation(ProjectionMatrix,P);
-	DimensionTransformation(ModelViewMatrix,MV);
 
+void Water::Paint(GLfloat P[][4], GLfloat MV[][4])
+{
 	//Bind the shader we want to draw with
 	shaderProgram->bind();
 	//Bind the VAO we want to draw
 	vao.bind();
 	clock_t utime = clock();
-	GLfloat t = utime / 1000.f;
+	GLfloat t = utime / 500.f;
 	//pass projection matrix to shader
 	shaderProgram->setUniformValue("proj_matrix",P);
 	//pass modelview matrix to shader

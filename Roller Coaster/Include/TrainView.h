@@ -13,6 +13,9 @@
 #include "Square.h"
 #include "Model.h"
 #include "Water.h"
+#include "Skybox.h"
+
+
 
 class AppMain;
 class CTrack;
@@ -82,6 +85,7 @@ public:
 	void initializeGL();
 	void initializeTexture();
 	void initializeMedia();
+	void initializeSkybox();
 	void printFPS();
 
 public:
@@ -113,6 +117,8 @@ public:
 	// **********************************
 	Model *spaceShip;
 	Model *tmp;
+	Skybox *sky;
+
 
 	// **********************************
 	// ****** Particle Parameter   ******
@@ -138,4 +144,5 @@ public:
 
 float distance(const Pnt3f &p1, const Pnt3f &p2);
 vector<vector<float>> Multiply(const vector<vector<float>> &m1, const vector<vector<float>> &m2);
+void DimensionTransformation(GLfloat source[], GLfloat target[][4]);
 #endif // TRAINVIEW_H  

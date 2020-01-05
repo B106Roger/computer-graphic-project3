@@ -28,11 +28,17 @@ void TrainView::initializeGL()
 	water = new Water();
 	water->Init();
 
+	//Create a skybox object
+	sky = new Skybox();
+	sky->Init();
+
 
 	//Initialize texture 
 	initializeTexture();
 	//Initialize music
 	initializeMedia();
+	//Initialize skybox
+	// initializeSkybox();
 
 	//particle參數
 	grav = 0.00003f;
@@ -86,6 +92,11 @@ void TrainView::initializeTexture()
 	//Load and create a texture for square;'stexture
 	QOpenGLTexture* texture = new QOpenGLTexture(QImage("./Textures/Tupi.bmp"));
 	Textures.push_back(texture);
+}
+
+void TrainView::initializeSkybox()
+{
+
 }
 void TrainView::resetArcball()
 //========================================================================
@@ -177,10 +188,16 @@ void TrainView::paintGL()
 	glGetFloatv(GL_MODELVIEW_MATRIX, ModelViewMatrex);
 	//Get projection matrix
 	glGetFloatv(GL_PROJECTION_MATRIX, ProjectionMatrex);
+	GLfloat MV[4][4];
+	GLfloat P[4][4];
+	DimensionTransformation(ModelViewMatrex, MV);
+	DimensionTransformation(ProjectionMatrex, P);
+
 
 	setupFloor();
 	glDisable(GL_LIGHTING);
-	water->Paint(ProjectionMatrex, ModelViewMatrex);
+	water->Paint(P, MV);
+	sky->paintSkybox(P, MV);
 	// drawFloor(200, 10);
 
 
@@ -291,6 +308,15 @@ setProjection()
 //========================================================================
 void TrainView::drawStuff(bool doingShadows)
 {
+	//Get modelview matrix
+	glGetFloatv(GL_MODELVIEW_MATRIX, ModelViewMatrex);
+	//Get projection matrix
+	glGetFloatv(GL_PROJECTION_MATRIX, ProjectionMatrex);
+	GLfloat MV[4][4];
+	GLfloat P[4][4];
+	DimensionTransformation(ModelViewMatrex, MV);
+	DimensionTransformation(ProjectionMatrex, P);
+
 	// Draw the control points
 	// don't draw the control points if you're driving 
 	// (otherwise you get sea-sick as you drive through them)
@@ -529,7 +555,7 @@ void TrainView::drawStuff(bool doingShadows)
 	d > 360.f ? d = 0.f : d += 0.1;
 	rotation.y = d - 90;
 	spaceShip->updateRotation(rotation, Point3d(r * cos(d *  PI / 180.0) / 10.f, 10.f, -r * sin(d * PI / 180.0) / 10.f));
-	spaceShip->render(false, false);
+	spaceShip->render(P, MV, false, false);
 	//tmp->render(false, false);
 
 
@@ -1032,4 +1058,17 @@ void TrainView::printFPS()
 		fps = (int)framesPerSecond;
 		framesPerSecond = 0;
 	}
+}
+
+
+void DimensionTransformation(GLfloat source[], GLfloat target[][4])
+{
+	//for uniform value, transfer 1 dimension to 2 dimension
+	int i = 0;
+	for (int j = 0; j < 4; j++)
+		for (int k = 0; k < 4; k++)
+		{
+			target[j][k] = source[i];
+			i++;
+		}
 }

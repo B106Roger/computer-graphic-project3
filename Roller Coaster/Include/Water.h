@@ -32,6 +32,5 @@ public:
 	void InitVAO();
 	void InitVBO();
 	void InitShader(QString vertexShaderPath,QString fragmentShaderPath, QString geomoetryShaderPath);
-	void Paint(GLfloat* ProjectionMatrix, GLfloat* ModelViewMatrix);
-	void DimensionTransformation(GLfloat source[],GLfloat target[][4]);
+	void Paint(GLfloat P[][4], GLfloat MV[][4]);
 };
