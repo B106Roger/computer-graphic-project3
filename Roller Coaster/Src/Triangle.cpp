@@ -1,4 +1,5 @@
 #include "Triangle.h"
+#include <time.h>
 #include <iostream>
 using namespace std;
 Triangle::Triangle()

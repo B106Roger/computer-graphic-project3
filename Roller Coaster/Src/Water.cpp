@@ -1,9 +1,10 @@
 #include "Water.h"
+#include <time.h>
 #include <iostream>
 using namespace std;
 Water::Water()
 {
-	size = 150;
+	size = 100;
 	numberOfSquare = 200;
 }
 
@@ -31,18 +32,6 @@ void Water::Paint(GLfloat P[][4], GLfloat MV[][4])
 	// 0: location; GL_FLOAT: 型別; 0: 從哪裡開始; 2: input vector維度; NULL: ?
 	//unbind buffer
 	vvbo.release();
-
-
-	//cvbo.bind();
-	////// Allocate and initialize the information
-	//cvbo.allocate(colors.constData(), colors.size() * sizeof(QVector3D));
-	//// Enable Attribute 1
-	//shaderProgram->enableAttributeArray(1);
-	//// Set Attribute 0 to be color
-	//shaderProgram->setAttributeArray(1,GL_FLOAT,0,3,NULL);
-	////unbind buffer
-	//cvbo.release();
-
 
 	//Draw a triangle with 3 indices starting from the 0th index
 	glDrawArrays(GL_TRIANGLES,0,vertices.size());
@@ -102,20 +91,6 @@ void Water::InitVBO()
 	vvbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
 	// Allocate and initialize the information
 	vvbo.allocate(vertices.constData(),vertices.size() * sizeof(QVector2D));
-
-	//Set each vertex's color
-	/*colors<<QVector3D(0.0f,1.0f,0.0f)
-		  <<QVector3D(0.0f,1.0f,0.0f)
-		  <<QVector3D(0.0f,1.0f,0.0f);*/
-	// Create Buffer for color
-	//cvbo.create();
-	//// Bind the buffer so that it is the current active buffer.
-	//cvbo.bind();
-	//// Since we will never change the data that we are about to pass the Buffer, we will say that the Usage Pattern is StaticDraw
-	//cvbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
-	//// Allocate and initialize the information
-	//cvbo.allocate(colors.constData(),colors.size() * sizeof(QVector3D));
-
 }
 void Water::InitShader(QString vertexShaderPath,QString fragmentShaderPath,QString geomoetryShaderPath)
 {

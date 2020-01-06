@@ -1,5 +1,5 @@
 #include "Square.h"
-
+#include <time.h>
 Square::Square()
 {
 }

@@ -13,7 +13,7 @@ uniform samplerCube skybox;
 
 void main()
 {
-	float ratio = 1.00 / 1.52;
+	float ratio = 1.00 / 1.00;
 	vec3 Normal = mat3(transpose(inverse(model_matrix))) * vs_normal;
 	vec3 Position = vec3(model_matrix * vec4(vs_worldpos, 1.0));
 	vec3 I = normalize(Position - cameraPos);
