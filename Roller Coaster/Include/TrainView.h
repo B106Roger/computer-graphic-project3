@@ -85,7 +85,6 @@ public:
 	void initializeGL();
 	void initializeTexture();
 	void initializeMedia();
-	void initializeSkybox();
 	void printFPS();
 
 public:
@@ -116,7 +115,8 @@ public:
 	// ********** 其他小物件   **********
 	// **********************************
 	Model *spaceShip;
-	Model *tmp;
+	Model *spaceShipReflection;
+	Model *spaceShipRefraction;
 	Skybox *sky;
 
 

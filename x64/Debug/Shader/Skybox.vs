@@ -10,6 +10,9 @@ out vec3 TexCoords;
 void main(void)
 {	
 	TexCoords = position;
-	vec3 newpos = position * 300.f;
-    gl_Position = proj_matrix * model_matrix * vec4(newpos, 1.0);
+	vec3 newpos = position * 100.f;
+	
+	mat4 new_model_matrix = mat4(mat3(model_matrix));
+	
+    gl_Position = proj_matrix * new_model_matrix * vec4(newpos, 1.0);
 }

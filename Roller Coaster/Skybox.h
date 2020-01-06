@@ -27,11 +27,10 @@ public:
 	void InitVBO();
 	void InitTexture();
 	void InitShader(QString vertexShaderPath, QString fragmentShaderPath);
-
+	unsigned int skyboxTextureID;
 
 private:
 	TextureImage skybox[6];
-	unsigned int skyboxTextureID;
 	QOpenGLVertexArrayObject vao;
 	QOpenGLBuffer vvbo;
 

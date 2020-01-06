@@ -6,17 +6,17 @@
 
 #include <QtOpenGL/QtOpenGL>
 
-bool Model::firstInitShader = false;
-QOpenGLShader*  Model::vertexShader = NULL;
-QOpenGLShader*  Model::geometryShader = NULL;
-QOpenGLShader*  Model::fragmentShader = NULL;
 
-Model::Model(const QString &filePath, int s, Point3d p)
+GLuint Model::skyboxShaderID = 0;
+
+Model::Model(const QString &filePath, int s, Point3d p, ShaderType type)
 	: m_fileName(QFileInfo(filePath).fileName())
 {
 	QFile file(filePath);
-	if (!file.open(QIODevice::ReadOnly))
+	if (!file.open(QIODevice::ReadOnly)) {
+		qDebug() << file.errorString() << endl;
 		return;
+	}
 
 	boundsMin = Point3d( 1e9, 1e9, 1e9);
 	boundsMax = Point3d(-1e9,-1e9,-1e9);
@@ -87,6 +87,8 @@ Model::Model(const QString &filePath, int s, Point3d p)
 	for (int i = 0; i < m_target_normals.size(); ++i)
 		m_target_normals[i] = m_target_normals[i].normalize();
 
+	file.close();
+	shadertype = type;
 	Init();
 }
 
@@ -120,10 +122,15 @@ void Model::render(GLfloat P[][4], GLfloat MV[][4], bool wireframe, bool normals
 		shaderProgram->setUniformValue("inputPos", inputPos);
 		shaderProgram->setUniformValue("inputRot", inputRot);
 		shaderProgram->setUniformValue("inputConst", inputConst);
+		shaderProgram->setUniformValue("inputConst", inputConst);
+		if (shadertype == REFLECTION)
+			shaderProgram->setUniformValue("cameraPos", eyePosition);
 
 		vvbo.bind();
 		shaderProgram->enableAttributeArray(0);
 		shaderProgram->setAttributeArray(0, GL_FLOAT, 0, 3, NULL);
+		if (shadertype == REFLECTION)
+			glBindTexture(GL_TEXTURE_CUBE_MAP, Model::skyboxShaderID);
 		vvbo.release();
 
 		glDrawElements(GL_TRIANGLES, m_pointIndices.size(), GL_UNSIGNED_INT, m_pointIndices.data());
@@ -150,35 +157,27 @@ void Model::render(GLfloat P[][4], GLfloat MV[][4], bool wireframe, bool normals
 
 void Model::updateRotation(Point3d rotationDir, Point3d p)
 {
-	if (!(p == position && rotationDir == rotation))
-	{
-		/*const Point3d bounds = boundsMax - boundsMin;
-		const qreal scale = this->scale / qMax(bounds.x, qMax(bounds.y, bounds.z));*/
-
-		/*for (int i = 0; i < m_points.size(); ++i)
-			m_target_points[i] = (m_points[i].m(rotationDir.x, rotationDir.y, rotationDir.z) + p - (boundsMin + bounds * 0.5)) * scale;
-
-		m_target_normals.resize(m_points.size());*/
-		//for (int i = 0; i < m_pointIndices.size(); i += 3) {
-		//	const Point3d a = m_points.at(m_pointIndices.at(i));
-		//	const Point3d b = m_points.at(m_pointIndices.at(i + 1));
-		//	const Point3d c = m_points.at(m_pointIndices.at(i + 2));
-
-		//	const Point3d normal = cross(b - a, c - a).normalize();
-
-		//	for (int j = 0; j < 3; ++j)
-		//		m_target_normals[m_pointIndices.at(i + j)] = normal.normalize();
-
-		//}
-
-		position = p;
-		this->rotation = rotationDir;
-	}
+	position = p;
+	rotation = rotationDir;
 }
 
 void Model::Init()
 {
-	InitShader("./Shader/Model.vs", "./Shader/Model.fs", "./Shader/Model.gs");
+	switch (shadertype)
+	{
+	case NORMAL:
+		InitShader("./Shader/Model.vs", "./Shader/Model.fs", "./Shader/Model.gs");
+		break;
+	case REFLECTION:
+		InitShader("./Shader/Model.vs", "./Shader/Model-reflection.fs", "./Shader/Model.gs");
+		break;
+	case REFRACTION:
+		InitShader("./Shader/Model.vs", "./Shader/Model-refraction.fs", "./Shader/Model.gs");
+		break;
+	case TEXTURE:
+		InitShader("./Shader/Model.vs", "./Shader/CustomShader.fs", "./Shader/Model.gs");
+		break;
+	}
 	InitVAO();
 	InitVBO();
 }
@@ -205,51 +204,41 @@ void Model::InitShader(QString vertexShaderPath, QString fragmentShaderPath, QSt
 
 	// Create Shader
 	shaderProgram = new QOpenGLShaderProgram();
-	if (!firstInitShader)
+	QFileInfo  vertexShaderFile(vertexShaderPath);
+	if (vertexShaderFile.exists())
 	{
-		firstInitShader = true;
-		QFileInfo  vertexShaderFile(vertexShaderPath);
-		if (vertexShaderFile.exists())
-		{
-			vertexShader = new QOpenGLShader(QOpenGLShader::Vertex);
-			if (vertexShader->compileSourceFile(vertexShaderPath))
-				shaderProgram->addShader(vertexShader);
-			else
-				qWarning() << "Vertex Shader Error " << vertexShader->log();
-		}
+		vertexShader = new QOpenGLShader(QOpenGLShader::Vertex);
+		if (vertexShader->compileSourceFile(vertexShaderPath))
+			shaderProgram->addShader(vertexShader);
 		else
-			qDebug() << vertexShaderFile.filePath() << " can't be found";
-
-		QFileInfo  geometryShaderFile(geomoetryShaderPath);
-		if (geometryShaderFile.exists())
-		{
-			geometryShader = new QOpenGLShader(QOpenGLShader::Geometry);
-			if (geometryShader->compileSourceFile(geomoetryShaderPath))
-				shaderProgram->addShader(geometryShader);
-			else
-				qWarning() << "Geometry Shader Error " << geometryShader->log();
-		}
-		else
-			qDebug() << geometryShaderFile.filePath() << " can't be found";
-
-		QFileInfo  fragmentShaderFile(fragmentShaderPath);
-		if (fragmentShaderFile.exists())
-		{
-			fragmentShader = new QOpenGLShader(QOpenGLShader::Fragment);
-			if (fragmentShader->compileSourceFile(fragmentShaderPath))
-				shaderProgram->addShader(fragmentShader);
-			else
-				qWarning() << "fragment Shader Error " << fragmentShader->log();
-		}
-		else
-			qDebug() << fragmentShaderFile.filePath() << " can't be found";
+			qWarning() << "Vertex Shader Error " << vertexShader->log();
 	}
-	else 
+	else
+		qDebug() << vertexShaderFile.filePath() << " can't be found";
+
+	QFileInfo  geometryShaderFile(geomoetryShaderPath);
+	if (geometryShaderFile.exists())
 	{
-		shaderProgram->addShader(vertexShader);
-		shaderProgram->addShader(geometryShader);
-		shaderProgram->addShader(fragmentShader);
+		geometryShader = new QOpenGLShader(QOpenGLShader::Geometry);
+		if (geometryShader->compileSourceFile(geomoetryShaderPath))
+			shaderProgram->addShader(geometryShader);
+		else
+			qWarning() << "Geometry Shader Error " << geometryShader->log();
 	}
+	else
+		qDebug() << geometryShaderFile.filePath() << " can't be found";
+
+	QFileInfo  fragmentShaderFile(fragmentShaderPath);
+	if (fragmentShaderFile.exists())
+	{
+		fragmentShader = new QOpenGLShader(QOpenGLShader::Fragment);
+		if (fragmentShader->compileSourceFile(fragmentShaderPath))
+			shaderProgram->addShader(fragmentShader);
+		else
+			qWarning() << "fragment Shader Error " << fragmentShader->log();
+	}
+	else
+		qDebug() << fragmentShaderFile.filePath() << " can't be found";
 
 	
 	shaderProgram->link();

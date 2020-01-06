@@ -31,14 +31,13 @@ void TrainView::initializeGL()
 	//Create a skybox object
 	sky = new Skybox();
 	sky->Init();
+	Model::skyboxShaderID = sky->skyboxTextureID;
 
 
 	//Initialize texture 
 	initializeTexture();
 	//Initialize music
 	initializeMedia();
-	//Initialize skybox
-	// initializeSkybox();
 
 	//particle參數
 	grav = 0.00003f;
@@ -51,9 +50,9 @@ void TrainView::initializeGL()
 	DIVIDE_LINE = 80;
 	RAIL_WIDTH = 3.f;
 	// 其他物件
-	spaceShip = new Model(QStringLiteral(":/Object/Resources/Object/Transport_Shuttle_obj.obj"), 20, Point3d(-6.f, 10.f, 3.f));
-	//tmp = new Model(QStringLiteral(":/Object/Resources/object/arrow.obj"), 100, Point3d(0.f, 0.f, 3.f));
-
+	spaceShip = new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 10.f, 3.f));
+	spaceShipReflection = new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 20.f, 3.f), REFLECTION);
+	spaceShipRefraction = new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 20.f, 3.f), REFRACTION);
 	// 初始化火車時間
 	t_time = 0.f;
 	// 初始化火車跑布林參數
@@ -93,11 +92,6 @@ void TrainView::initializeTexture()
 	QOpenGLTexture* texture = new QOpenGLTexture(QImage("./Textures/Tupi.bmp"));
 	Textures.push_back(texture);
 }
-
-void TrainView::initializeSkybox()
-{
-
-}
 void TrainView::resetArcball()
 //========================================================================
 {
@@ -117,6 +111,7 @@ void TrainView::paintGL()
 	//**********************************************************************
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	// Set up the view port
+	// 978, 486
 	glViewport(0, 0, width(), height());
 	// clear the window, be sure to clear the Z-Buffer too
 	glClearColor(0, 0, 0.3f, 0);
@@ -192,12 +187,11 @@ void TrainView::paintGL()
 	GLfloat P[4][4];
 	DimensionTransformation(ModelViewMatrex, MV);
 	DimensionTransformation(ProjectionMatrex, P);
-
+	sky->paintSkybox(P, MV);
 
 	setupFloor();
 	glDisable(GL_LIGHTING);
 	water->Paint(P, MV);
-	sky->paintSkybox(P, MV);
 	// drawFloor(200, 10);
 
 
@@ -554,9 +548,19 @@ void TrainView::drawStuff(bool doingShadows)
 	static Point3d rotation(0, 0, 0);
 	d > 360.f ? d = 0.f : d += 0.1;
 	rotation.y = d - 90;
+
 	spaceShip->updateRotation(rotation, Point3d(r * cos(d *  PI / 180.0) / 10.f, 10.f, -r * sin(d * PI / 180.0) / 10.f));
 	spaceShip->render(P, MV, false, false);
-	//tmp->render(false, false);
+
+	
+	spaceShipReflection->updateRotation(rotation, Point3d(r * cos(d *  PI / 180.0) / 10.f, 20.f, -r * sin(d * PI / 180.0) / 10.f));
+	spaceShipReflection->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
+	spaceShipReflection->render(P, MV, false, false);
+
+	spaceShipRefraction->updateRotation(rotation, Point3d(r * cos(d *  PI / 180.0) / 10.f, 30.f, -r * sin(d * PI / 180.0) / 10.f));
+	spaceShipRefraction->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
+	spaceShipRefraction->render(P, MV, false, false);
+	
 
 
 #ifdef EXAMPLE_SOLUTION

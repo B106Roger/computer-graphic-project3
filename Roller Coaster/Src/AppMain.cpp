@@ -12,7 +12,7 @@ AppMain::AppMain(QWidget *parent)
 	ui.setupUi(this);
 	trainview = new TrainView();  
 	trainview->m_pTrack =  &m_Track;
-	setGeometry(100,25,1000,768);   
+	setGeometry(200,200,1000,768);   // 1000, 768
 	ui.mainLayout->layout()->addWidget(trainview);
 	trainview->installEventFilter(this);
 	this->canpan = false;

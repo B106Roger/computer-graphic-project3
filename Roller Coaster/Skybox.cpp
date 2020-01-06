@@ -112,14 +112,14 @@ void Skybox::InitTexture()
 
 	char filename[6][30] = {
 		
-		"./Textures/moondust_ft.tga",
-		"./Textures/moondust_bk.tga",
+		"./Textures/met_ft.tga",
+		"./Textures/met_bk.tga",
 		
-		"./Textures/moondust_dn.tga",
-		"./Textures/moondust_up.tga",
+		"./Textures/met_dn.tga",
+		"./Textures/met_up.tga",
 		
-		"./Textures/moondust_rt.tga",
-		"./Textures/moondust_lf.tga",
+		"./Textures/met_rt.tga",
+		"./Textures/met_lf.tga",
 		
 	};
 

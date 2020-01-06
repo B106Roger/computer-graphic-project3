@@ -13,11 +13,17 @@
 #include <math.h>
 #include "point3d.h"
 
+
+enum ShaderType { NORMAL, REFLECTION, REFRACTION ,TEXTURE };
+
 class Model
 {
 public:
+	static GLuint skyboxShaderID;
+
 	Model() {}
-	Model(const QString &filePath, int s, Point3d p);
+	Model(const QString &filePath, int s, Point3d p, ShaderType type = NORMAL);
+
 
 	void render(GLfloat P[][4], GLfloat MV[][4], bool wireframe = false, bool normals = false);
 	QString fileName() const { return m_fileName; }
@@ -30,12 +36,16 @@ public:
 	void InitShader(QString vertexShaderPath, QString fragmentShaderPath, QString geomoetryShaderPath);
 
 	void updateRotation(Point3d, Point3d);
+	void setEyePosition(float x, float y, float z) { eyePosition[0] = x; eyePosition[1] = y; eyePosition[2] = z; };
 private:
+
+	ShaderType shadertype;
 	Point3d boundsMin;
 	Point3d boundsMax;
 	int scale;
 	QString m_fileName;
 
+	QVector3D eyePosition;
 	Point3d position;
 	Point3d rotation;
 
@@ -44,16 +54,13 @@ private:
 	QVector<unsigned int> m_edgeIndices;
 	QVector<unsigned int> m_pointIndices;
 
-
-	
 	QOpenGLVertexArrayObject vao;
 	QOpenGLBuffer vvbo;
 	QOpenGLShaderProgram* shaderProgram;
 
-	static QOpenGLShader* vertexShader;
-	static QOpenGLShader* geometryShader;
-	static QOpenGLShader* fragmentShader;
-	static bool firstInitShader;
+	QOpenGLShader* vertexShader;
+	QOpenGLShader* geometryShader;
+	QOpenGLShader* fragmentShader;
 };
 
 #endif
