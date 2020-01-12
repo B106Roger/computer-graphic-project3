@@ -42,12 +42,6 @@ typedef struct tag_PARTICLE
 	tag_PARTICLE* pPrev;//上一particle   
 } Particle, *pParticle;
 
-typedef enum {
-	spline_Linear = 0,
-	spline_CardinalCubic = 1,
-	spline_CubicB_Spline = 2
-} spline_t;
-
 //#######################################################################
 // TODO
 // You might change the TrainView in order to add different objects to
@@ -71,6 +65,7 @@ public:
 	// it has to be encapsulated, since we draw differently if
 	// we're drawing shadows (no colors, for example)
 	void drawStuff(bool doingShadows=false);
+	void drawTrack(bool doingShadows = false);
 	void DrawParticles();
 	// setup the projection - assuming that the projection stack has been
 	// cleared for you
@@ -107,9 +102,10 @@ public:
 
 	float t_time;
 	unsigned int DIVIDE_LINE;
-	float RAIL_WIDTH;
+	const float RAIL_WIDTH = 2.f;
 	float TRAIN_SPEED;
 	void drawTrain(float);
+	vector<Model*> trainList;
 	
 	// **********************************
 	// ********** 其他小物件   **********
@@ -142,7 +138,6 @@ public:
 };  
 
 
-float distance(const Pnt3f &p1, const Pnt3f &p2);
-vector<vector<float>> Multiply(const vector<vector<float>> &m1, const vector<vector<float>> &m2);
+
 void DimensionTransformation(GLfloat source[], GLfloat target[][4]);
 #endif // TRAINVIEW_H  

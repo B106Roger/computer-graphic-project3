@@ -122,6 +122,7 @@ bool AppMain::eventFilter(QObject *watched, QEvent *e) {
 			cp->pos.x = (float) rx;
 			cp->pos.y = (float) ry;
 			cp->pos.z = (float) rz;
+			setTrackDirty("eventFilter MoveControlPoint");
 		}
 		if(trainview->arcball.mode != trainview->arcball.None) { // we're taking the drags
 			float x,y;
@@ -247,15 +248,18 @@ void AppMain::ChangeCurveType( QString type )
 {
 	if( type == "Linear" )
 	{
-		this->trainview->curve = 0;
+		setTrackDirty("ChangeCurveType Linear");
+		this->trainview->m_pTrack->splineType = LINE;
 	}
 	else if( type == "Cardinal" )
 	{
-		this->trainview->curve = 1;
+		setTrackDirty("ChangeCurveType Cardinal");
+		this->trainview->m_pTrack->splineType = CARDINAL;
 	}
 	else if( type == "Cubic" )
 	{
-		this->trainview->curve = 2;
+		setTrackDirty("ChangeCurveType Cubic");
+		this->trainview->m_pTrack->splineType = B_SPLINE;
 	}
 
 
@@ -306,6 +310,7 @@ void AppMain::ChangeSpeedOfTrain( int val )
 
 void AppMain::AddControlPoint()
 {
+	setTrackDirty("AddControlPoint");
 	// get the number of points
 	size_t npts = this->m_Track.points.size();
 	// the number for the new point
@@ -328,6 +333,7 @@ void AppMain::AddControlPoint()
 
 void AppMain::DeleteControlPoint()
 {
+	setTrackDirty("DeleteControlPoint");
 	if (this->m_Track.points.size() > 4) {
 		if (this->trainview->selectedCube >= 0) {
 			this->m_Track.points.erase(this->m_Track.points.begin() + this->trainview->selectedCube);
@@ -357,11 +363,13 @@ void AppMain::rollx(float dir)
 
 void AppMain::RotateControlPointAddX()
 {
+	setTrackDirty("RotateControlPointAddX");
 	rollx(1);
 }
 
 void AppMain::RotateControlPointSubX()
 {
+	setTrackDirty("RotateControlPointSubX");
 	rollx(-1);
 }
 
@@ -383,11 +391,13 @@ void AppMain::rollz(float dir)
 
 void AppMain::RotateControlPointAddZ()
 {
+	setTrackDirty("RotateControlPointAddZ");
 	rollz(1);
 }
 
 void AppMain::RotateControlPointSubZ()
 {
+	setTrackDirty("RotateControlPointSubZ");
 	rollz(-1);
 }
 
@@ -408,16 +418,19 @@ void AppMain::ChangeCamToTrain()
 
 void AppMain::ChangeCurveToLinear()
 {
+	setTrackDirty("ChangeCurveToLinear");
 	this->trainview->curve = 0;
 }
 
 void AppMain::ChangeCurveToCardinal()
 {
+	setTrackDirty("ChangeCurveToCardinal");
 	this->trainview->curve = 1;
 }
 
 void AppMain::ChangeCurveToCubic()
 {
+	setTrackDirty("ChangeCurveToCubic");
 	this->trainview->curve = 2;
 }
 
@@ -490,8 +503,20 @@ advanceTrain(float dir)
 		if (this->trainview->isrun) {
 			if (clock() - lastRedraw > CLOCKS_PER_SEC / 30) {
 				lastRedraw = clock();
-				this->advanceTrain();
+				// this->advanceTrain();
 				this->damageMe();
+
+				if (this->trainview->m_pTrack->pointIndex < this->trainview->m_pTrack->samplePoints.front().size() - 1u)
+				{
+					this->trainview->m_pTrack->pointIndex++;
+				}
+				else
+				{
+					this->trainview->m_pTrack->curveIndex += 1;
+					this->trainview->m_pTrack->pointIndex = 0;
+					this->trainview->m_pTrack->curveIndex = this->trainview->m_pTrack->curveIndex % this->trainview->m_pTrack->samplePoints.size();
+
+				}
 			}
 		}
 	}
@@ -507,4 +532,13 @@ advanceTrain(float dir)
 		matrix1_look.z + matrix4_look.z, matrix2_look.x, matrix2_look.y + 5, matrix2_look.z);*/
 
 
+}
+
+void AppMain::
+setTrackDirty(const char * msg)
+{
+	//system("CLS");
+	//cout << msg << endl;
+	this->trainview->m_pTrack->dirty = true;
+	
 }

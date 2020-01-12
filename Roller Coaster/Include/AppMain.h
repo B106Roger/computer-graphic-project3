@@ -87,6 +87,7 @@ private:
 		void RotateControlPointAddZ();
 		void RotateControlPointSubZ();
 
+		void setTrackDirty(const char*);
 protected:
 	bool eventFilter(QObject *watched, QEvent *e); 
 };

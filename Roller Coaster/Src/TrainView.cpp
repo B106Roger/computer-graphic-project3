@@ -48,11 +48,12 @@ void TrainView::initializeGL()
 	// 軌道參數
 	curve = 0;          // 軌道類別
 	DIVIDE_LINE = 80;
-	RAIL_WIDTH = 3.f;
 	// 其他物件
 	spaceShip = new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 10.f, 3.f));
 	spaceShipReflection = new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 20.f, 3.f), REFLECTION);
 	spaceShipRefraction = new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 20.f, 3.f), REFRACTION);
+
+	trainList.push_back(new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 20.f, 3.f), REFRACTION));
 	// 初始化火車時間
 	t_time = 0.f;
 	// 初始化火車跑布林參數
@@ -331,204 +332,8 @@ void TrainView::drawStuff(bool doingShadows)
 	// TODO: 
 	// call your own track drawing code
 	//####################################################################
-	spline_t type_spline = (spline_t)curve;
 
-	switch (type_spline)
-	{
-	case spline_Linear:
-	{
-		for (size_t i = 0; i < m_pTrack->points.size(); ++i)
-		{
-			Pnt3f cp_pos_p1 = m_pTrack->points[i].pos;
-			Pnt3f cp_pos_p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].pos;
-			// orient
-			Pnt3f cp_orient_p1 = m_pTrack->points[i].orient;
-			Pnt3f cp_orient_p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].orient;
-
-
-
-			float percent = 1.0f / DIVIDE_LINE;
-			float t = 0;
-			Pnt3f qt, qt0, qt1, qt2, orient_t, cross_t, previous_qt;
-
-			// 用控制點求出內差點
-			qt = (1 - t) * cp_pos_p1 + t * cp_pos_p2;
-
-			previous_qt = qt;
-			for (size_t j = 0; j < DIVIDE_LINE; j++) {
-				// 處理軌道線條
-				qt0 = qt;
-				orient_t = (1 - t) * cp_orient_p1 + t * cp_orient_p2;
-
-				t += percent;
-
-				qt = (1 - t) * cp_pos_p1 + t * cp_pos_p2;
-				qt1 = qt;
-
-				// 向左右延伸距離
-				orient_t.normalize();
-				cross_t = (qt1 - qt0) * orient_t;
-				cross_t.normalize();
-				cross_t = cross_t * 2.5f;
-
-				// 畫出兩側軌道
-				glLineWidth(3);
-
-				if (!doingShadows) {
-					glColor3ub(32, 32, 64);
-				}
-				glBegin(GL_LINES);
-				glVertex3f(qt0.x + cross_t.x, qt0.y + cross_t.y, qt0.z + cross_t.z);
-				glVertex3f(qt1.x + cross_t.x, qt1.y + cross_t.y, qt1.z + cross_t.z);
-
-				glVertex3f(qt1.x - cross_t.x, qt1.y - cross_t.y, qt1.z - cross_t.z);
-				glVertex3f(qt0.x - cross_t.x, qt0.y - cross_t.y, qt0.z - cross_t.z);
-				glEnd();
-
-				// 畫出鐵軌板子
-				float dist = distance(previous_qt, qt0);
-				if (dist > RAIL_WIDTH * 2.f)
-				{
-					Pnt3f tangentP = (qt1 - qt0);
-					tangentP.normalize();
-					tangentP = qt0 + tangentP * RAIL_WIDTH;
-					if (!doingShadows) {
-						glColor3ub(255, 255, 255);
-					}
-					glBegin(GL_POLYGON);
-					glVertex3f(qt0.x + cross_t.x, qt0.y + cross_t.y, qt0.z + cross_t.z);
-					glVertex3f(tangentP.x + cross_t.x, tangentP.y + cross_t.y, tangentP.z + cross_t.z);
-
-					glVertex3f(tangentP.x - cross_t.x, tangentP.y - cross_t.y, tangentP.z - cross_t.z);
-					glVertex3f(qt0.x - cross_t.x, qt0.y - cross_t.y, qt0.z - cross_t.z);
-					glEnd();
-
-					previous_qt = qt0;
-				}
-				glLineWidth(1);
-			}
-		}
-		break;
-	}
-	default:
-	{
-		const vector<vector<float>> &M = M_curve[this->curve];
-		for (size_t i = 0; i < m_pTrack->points.size(); ++i)
-		{
-			// position
-			const Pnt3f &cp_pos_p1 = m_pTrack->points[i].pos;
-			const Pnt3f &cp_pos_p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].pos;
-			const Pnt3f &cp_pos_p3 = m_pTrack->points[(i + 2) % m_pTrack->points.size()].pos;
-			const Pnt3f &cp_pos_p4 = m_pTrack->points[(i + 3) % m_pTrack->points.size()].pos;
-			// orient
-			const Pnt3f &cp_orient_p1 = m_pTrack->points[i].orient;
-			const Pnt3f &cp_orient_p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].orient;
-			const Pnt3f &cp_orient_p3 = m_pTrack->points[(i + 2) % m_pTrack->points.size()].orient;
-			const Pnt3f &cp_orient_p4 = m_pTrack->points[(i + 3) % m_pTrack->points.size()].orient;
-
-			const vector<vector<float>>
-				G = {
-					{cp_pos_p1.x,cp_pos_p2.x,cp_pos_p3.x,cp_pos_p4.x},
-					{cp_pos_p1.y,cp_pos_p2.y,cp_pos_p3.y,cp_pos_p4.y},
-					{cp_pos_p1.z,cp_pos_p2.z,cp_pos_p3.z,cp_pos_p4.z},
-			},
-			G_orient = {
-				{cp_orient_p1.x,cp_orient_p2.x,cp_orient_p3.x,cp_orient_p4.x},
-				{cp_orient_p1.y,cp_orient_p2.y,cp_orient_p3.y,cp_orient_p4.y},
-				{cp_orient_p1.z,cp_orient_p2.z,cp_orient_p3.z,cp_orient_p4.z},
-			};
-
-			float percent = 1.0f / (DIVIDE_LINE);
-			float t = 0;
-			Pnt3f qt, qt0, qt1, qt2, orient_t, cross_t, previous_qt;
-
-			vector<vector<float>>
-				T =
-			{
-				{0},
-				{0},
-				{0},
-				{1}
-			};
-			// 用控制點求出內差點
-			vector<vector<float>> qt_v = Multiply(G, Multiply(M, T));
-			qt = Pnt3f(qt_v[0][0], qt_v[1][0], qt_v[2][0]);
-
-
-			previous_qt = qt;
-			for (size_t j = 0; j < DIVIDE_LINE; j++)
-			{
-				// 處理軌道線條
-				T = {
-					{pow(t,3)},
-					{pow(t,2)},
-					{t},
-					{1}
-				};
-				qt_v = Multiply(G, Multiply(M, T));
-				qt0 = Pnt3f(qt_v[0][0], qt_v[1][0], qt_v[2][0]);
-
-
-				vector<vector<float>> orient_v = Multiply(G_orient, Multiply(M, T));
-				orient_t = Pnt3f(orient_v[0][0], orient_v[1][0], orient_v[2][0]);
-
-
-				t += percent;
-				T = {
-					{pow(t,3)},
-					{pow(t,2)},
-					{t},
-					{1}
-				};
-				qt_v = Multiply(G, Multiply(M, T));
-				qt1 = Pnt3f(qt_v[0][0], qt_v[1][0], qt_v[2][0]);
-
-				// 向左右延伸距離
-				orient_t.normalize();
-				cross_t = (qt1 - qt0) * orient_t;
-				cross_t.normalize();
-				cross_t = cross_t * 2.5f;
-
-				// 畫出兩側軌道
-				glLineWidth(3);
-
-				if (!doingShadows) {
-					glColor3ub(32, 32, 64);
-				}
-				glBegin(GL_LINES);
-				glVertex3f(qt0.x + cross_t.x, qt0.y + cross_t.y, qt0.z + cross_t.z);
-				glVertex3f(qt1.x + cross_t.x, qt1.y + cross_t.y, qt1.z + cross_t.z);
-
-				glVertex3f(qt1.x - cross_t.x, qt1.y - cross_t.y, qt1.z - cross_t.z);
-				glVertex3f(qt0.x - cross_t.x, qt0.y - cross_t.y, qt0.z - cross_t.z);
-				glEnd();
-
-				// 畫出鐵軌板子
-				float dist = distance(previous_qt, qt0);
-				if (dist > RAIL_WIDTH * 2.f)
-				{
-					Pnt3f tangentP = (qt1 - qt0);
-					tangentP.normalize();
-					tangentP = qt0 + tangentP * RAIL_WIDTH;
-					if (!doingShadows) {
-						glColor3ub(255, 255, 255);
-					}
-					glBegin(GL_POLYGON);
-					glVertex3f(qt0.x + cross_t.x, qt0.y + cross_t.y, qt0.z + cross_t.z);
-					glVertex3f(tangentP.x + cross_t.x, tangentP.y + cross_t.y, tangentP.z + cross_t.z);
-
-					glVertex3f(tangentP.x - cross_t.x, tangentP.y - cross_t.y, tangentP.z - cross_t.z);
-					glVertex3f(qt0.x - cross_t.x, qt0.y - cross_t.y, qt0.z - cross_t.z);
-					glEnd();
-
-					previous_qt = qt0;
-				}
-				glLineWidth(1);
-			}
-		}
-		break;
-	}
-	}
+	this->drawTrack(doingShadows);
 
 
 
@@ -549,10 +354,11 @@ void TrainView::drawStuff(bool doingShadows)
 	d > 360.f ? d = 0.f : d += 0.1;
 	rotation.y = d - 90;
 
+	rotation.z = -16.69929;
 	spaceShip->updateRotation(rotation, Point3d(r * cos(d *  PI / 180.0) / 10.f, 10.f, -r * sin(d * PI / 180.0) / 10.f));
 	spaceShip->render(P, MV, false, false);
 
-	
+	rotation.z = 16.69929;
 	spaceShipReflection->updateRotation(rotation, Point3d(r * cos(d *  PI / 180.0) / 10.f, 20.f, -r * sin(d * PI / 180.0) / 10.f));
 	spaceShipReflection->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
 	spaceShipReflection->render(P, MV, false, false);
@@ -568,6 +374,120 @@ void TrainView::drawStuff(bool doingShadows)
 	if (!tw->trainCam->value())
 		drawTrain(this, doingShadows);
 #endif
+}
+
+void TrainView::
+drawTrack(bool doingShadows)
+{
+	this->m_pTrack->computeSamplePoint();
+	if (!doingShadows) {
+		glColor3ub(255, 255, 255);
+	}
+	Pnt3f previous_sample = this->m_pTrack->samplePoints.front().front();
+	for (int i = 0; i < this->m_pTrack->samplePoints.size(); i++)
+	{
+		vector<Pnt3f> &curveSamplePoint = this->m_pTrack->samplePoints[i];
+		vector<Pnt3f> &curveNormalVectors = this->m_pTrack->normalVectors[i];
+		for (int j = 0; j < curveSamplePoint.size() - 1u; j++)
+		{
+			Pnt3f sample1 = curveSamplePoint[j];
+			Pnt3f sample2 = curveSamplePoint[j + 1];
+			Pnt3f normal = curveNormalVectors[j];
+			if (j == curveSamplePoint.size() - 2u)
+			{
+				int breakpoint = 0;
+			}
+			switch (this->track)
+			{
+			case 0:
+			{
+				glBegin(GL_LINES);
+				glVertex3f(sample1.x, sample1.y, sample1.z);
+				glVertex3f(sample2.x, sample2.y, sample2.z);
+				glEnd();
+				break;
+			}
+			case 1:
+			{
+				Pnt3f tangent = sample2 - sample1;
+				Pnt3f cross_t = tangent * normal;
+				cross_t.normalize();
+				cross_t = cross_t * 2.5f;
+
+				// 畫兩側鐵軌
+				glLineWidth(3);
+				glBegin(GL_LINES);
+				glVertex3f(sample1.x + cross_t.x, sample1.y + cross_t.y, sample1.z + cross_t.z);
+				glVertex3f(sample2.x + cross_t.x, sample2.y + cross_t.y, sample2.z + cross_t.z);
+
+				glVertex3f(sample1.x - cross_t.x, sample1.y - cross_t.y, sample1.z - cross_t.z);
+				glVertex3f(sample2.x - cross_t.x, sample2.y - cross_t.y, sample2.z - cross_t.z);
+				glEnd();
+				glLineWidth(1);
+				
+				float dist = distance(previous_sample, sample1);
+				if (dist > RAIL_WIDTH * 2)
+				{
+					Pnt3f tangentP = (sample1 - sample2);
+					tangentP.normalize();
+					tangentP = sample1 + tangentP * RAIL_WIDTH;
+					
+					glBegin(GL_POLYGON);
+					glVertex3f(sample1.x + cross_t.x, sample1.y + cross_t.y, sample1.z + cross_t.z);
+					glVertex3f(tangentP.x + cross_t.x, tangentP.y + cross_t.y, tangentP.z + cross_t.z);
+
+					glVertex3f(tangentP.x - cross_t.x, tangentP.y - cross_t.y, tangentP.z - cross_t.z);
+					glVertex3f(sample1.x - cross_t.x, sample1.y - cross_t.y, sample1.z - cross_t.z);
+					glEnd();
+
+					previous_sample = sample1;
+				}
+				break;
+			}
+			
+			case 3:
+			default:
+				break;
+			}
+		}
+	}
+}
+
+void TrainView::
+drawTrain(float t)
+{
+	int curveIndex = this->m_pTrack->curveIndex;
+	int pointIndex = this->m_pTrack->pointIndex;
+
+	Pnt3f _normal = this->m_pTrack->normalVectors[curveIndex][pointIndex];
+	Pnt3f _sample1 = this->m_pTrack->samplePoints[curveIndex][pointIndex];
+	Pnt3f _sample2;
+	if (pointIndex == (int)this->m_pTrack->samplePoints[curveIndex].size() - 1)
+		// 這裡有bug, 因為第一條曲線的最後一個點跟第二條曲線的第一個點一樣, 所以計算出的tangent=0,0,0
+		_sample2 = this->m_pTrack->
+		samplePoints[(curveIndex + 1) % this->m_pTrack->samplePoints.size()][1];
+	else
+		_sample2 = this->m_pTrack->samplePoints[curveIndex][pointIndex + 1];
+
+	Point3d normal = Point3d(_normal.x, _normal.y, _normal.z);
+	Point3d sample1 = Point3d(_sample1.x, _sample1.y, _sample1.z);
+	Point3d sample2 = Point3d(_sample2.x, _sample2.y, _sample2.z);
+	GLfloat MV[4][4];
+	GLfloat P[4][4];
+	DimensionTransformation(ModelViewMatrex, MV);
+	DimensionTransformation(ProjectionMatrex, P);
+
+	Point3d tangent = sample2 - sample1;
+	for (Model* model : trainList)
+	{
+		model->setEyePosition(-arcball.eyeX, -arcball.eyeY, -arcball.eyeZ);
+		if (pointIndex >= 80)
+			model->updateRotation(sample1, tangent, normal);
+		else
+			model->updateRotation(sample1, tangent, normal);
+		model->render(P, MV);
+		
+	}
 }
 
 void TrainView::
@@ -929,123 +849,6 @@ Explosion3(Particle* par)
 		ep.AddSpeed = 0.2f;
 		AddParticle(ep);
 	}
-}
-
-void TrainView::
-drawTrain(float t)
-{
-	t *= m_pTrack->points.size();
-	size_t i;
-	for (i = 0; t > 1; t -= 1)
-		i++;
-
-	// position
-	const Pnt3f &cp_pos_p1 = m_pTrack->points[i].pos;
-	const Pnt3f &cp_pos_p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].pos;
-	const Pnt3f &cp_pos_p3 = m_pTrack->points[(i + 2) % m_pTrack->points.size()].pos;
-	const Pnt3f &cp_pos_p4 = m_pTrack->points[(i + 3) % m_pTrack->points.size()].pos;
-
-	// orient
-	const Pnt3f &cp_orient_p1 = m_pTrack->points[i].orient;
-	const Pnt3f &cp_orient_p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].orient;
-	const Pnt3f &cp_orient_p3 = m_pTrack->points[(i + 2) % m_pTrack->points.size()].orient;
-	const Pnt3f &cp_orient_p4 = m_pTrack->points[(i + 3) % m_pTrack->points.size()].orient;
-
-	vector<vector<float>> &M = M_curve[this->curve];
-	vector<vector<float>> T;
-	vector<vector<float>> G = {
-		{cp_pos_p1.x,cp_pos_p2.x,cp_pos_p3.x,cp_pos_p4.x},
-		{cp_pos_p1.y,cp_pos_p2.y,cp_pos_p3.y,cp_pos_p4.y},
-		{cp_pos_p1.z,cp_pos_p2.z,cp_pos_p3.z,cp_pos_p4.z}
-	};
-	vector<vector<float>> G_orient = {
-		{cp_orient_p1.x,cp_orient_p2.x,cp_orient_p3.x,cp_orient_p4.x},
-		{cp_orient_p1.y,cp_orient_p2.y,cp_orient_p3.y,cp_orient_p4.y},
-		{cp_orient_p1.z,cp_orient_p2.z,cp_orient_p3.z,cp_orient_p4.z}
-	}, tmp;
-
-
-	spline_t type_spline = (spline_t)curve;
-	Pnt3f qt, qt0, qt1, orient_t, cross_t;
-	switch (type_spline) {
-	case spline_Linear:
-		// Linear
-		qt = (1 - t) * cp_pos_p1 + t * cp_pos_p2;
-		orient_t = (1 - t) * cp_orient_p1 + t * cp_orient_p2;
-		break;
-
-	case spline_CardinalCubic:
-	case spline_CubicB_Spline:
-		T = { {pow(t,3)}, {pow(t,2)}, {t}, {1} };
-		tmp = Multiply(G_orient, Multiply(M, T));
-		orient_t = Pnt3f(tmp[0][0], tmp[1][0], tmp[2][0]);
-		tmp = Multiply(G, Multiply(M, T));
-		qt = Pnt3f(tmp[0][0], tmp[1][0], tmp[2][0]);
-		break;
-	}
-	qt0 = qt;
-
-	t += 0.01f;
-	switch (type_spline) {
-	case spline_Linear:
-		// Linear
-		qt = (1 - t) * cp_pos_p1 + t * cp_pos_p2;
-		orient_t = (1 - t) * cp_orient_p1 + t * cp_orient_p2;
-		break;
-
-	case spline_CardinalCubic:
-	case spline_CubicB_Spline:
-		T = { {pow(t,3)}, {pow(t,2)}, {t}, {1} };
-		tmp = Multiply(G_orient, Multiply(M, T));
-		orient_t = Pnt3f(tmp[0][0], tmp[1][0], tmp[2][0]);
-		tmp = Multiply(G, Multiply(M, T));
-		qt = Pnt3f(tmp[0][0], tmp[1][0], tmp[2][0]);
-		break;
-	}
-	qt1 = qt;
-
-
-	orient_t.normalize();
-	cross_t = (qt1 - qt0) * orient_t;
-	cross_t.normalize();
-	cross_t = cross_t * 2.5f;
-	orient_t = 5 * orient_t;
-
-	qt1 = qt0 - cross_t;
-	qt0 = qt0 + cross_t;
-
-
-	glBegin(GL_POLYGON);
-	glVertex3f(qt0.x, qt0.y, qt0.z);
-	glVertex3f(qt0.x + orient_t.x, qt0.y + orient_t.y, qt0.z + orient_t.z);
-
-	glVertex3f(qt1.x + orient_t.x, qt1.y + orient_t.y, qt1.z + orient_t.z);
-	glVertex3f(qt1.x, qt1.y, qt1.z);
-	glEnd();
-}
-
-
-float distance(const Pnt3f &p1, const Pnt3f &p2)
-{
-	float x_2 = (p1.x - p2.x) * (p1.x - p2.x);
-	float y_2 = (p1.y - p2.y) * (p1.y - p2.y);
-	float z_2 = (p1.z - p2.z) * (p1.z - p2.z);
-	return sqrt(x_2 + y_2 + z_2);
-}
-vector<vector<float>> Multiply(const vector<vector<float>> &m1, const vector<vector<float>> &m2)
-{
-	vector<vector<float>> result(m1.size(), vector<float>(m2[0].size(), 0));
-	for (int i = 0; i < result.size(); i++)
-	{
-		for (int j = 0; j < result[0].size(); j++)
-		{
-			for (int k = 0; k < m1[0].size(); k++)
-			{
-				result[i][j] += m1[i][k] * m2[k][j];
-			}
-		}
-	}
-	return result;
 }
 
 void TrainView::printFPS()

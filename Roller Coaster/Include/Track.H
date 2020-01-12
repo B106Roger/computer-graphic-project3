@@ -31,6 +31,9 @@ using std::vector; // avoid having to say std::vector all of the time
 
 // make use of other data structures from this project
 #include "ControlPoint.H"
+#include "Utilities/Pnt3f.H"
+
+enum SplineType { LINE, CARDINAL, B_SPLINE };
 
 class CTrack {
 	public:		
@@ -53,6 +56,9 @@ class CTrack {
 		// objects that we know that all implementations are going to need and that
 		// we're going to have to handle specially
 		vector<ControlPoint> points;
+		bool dirty;
+		bool optimization; // set to false after optimize
+		SplineType splineType;
 
 		//###################################################################
 		// TODO: you might want to do this differently
@@ -60,4 +66,23 @@ class CTrack {
 		// the state of the train - basically, all I need to remember is where
 		// it is in parameter space
 		float trainU;
+		void computeSamplePoint();
+		void computeSegmentNumber();
+		void computeSegmentArclength();
+
+		vector<vector<Pnt3f>> samplePoints;
+		vector<vector<Pnt3f>> normalVectors;
+		int curveIndex;
+		int pointIndex;
+
+
+		vector<int> segmentNumber;
+		vector<float> segmentArclength;
+	private:
+		vector<vector<vector<float>>> M_curve;
+		const int DIVIDE_LINE = 80;
+		const int SAMPLE_NUMBER = 10000;
+
 };
+float distance(const Pnt3f &p1, const Pnt3f &p2);
+vector<vector<float>> Multiply(const vector<vector<float>> &m1, const vector<vector<float>> &m2);

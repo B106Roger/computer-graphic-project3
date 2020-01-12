@@ -31,10 +31,36 @@
 // * Constructor
 //============================================================================
 CTrack::
-CTrack() : trainU(0)
+CTrack() : trainU(0), dirty(true), curveIndex(0), pointIndex(0)
 //============================================================================
 {
 	resetPoints();
+	vector<vector<float>>
+		spline_Linear =
+	{
+		{1,0,0,0},
+		{0,1,0,0},
+		{0,0,1,0},
+		{0,0,0,1},
+	},
+	spline_CardinalCubic =
+	{
+		{    -0.5,   1, -0.5,       0},
+		{     1.5,-2.5,    0,       1},
+		{    -1.5,   2,  0.5,       0},
+		{     0.5,-0.5,    0,       0},
+	},
+	spline_CubicB_Spline =
+	{
+		{-1.f / 6, 0.5, -0.5, 1.f / 6},
+		{     0.5,  -1,    0, 2.f / 3},
+		{    -0.5, 0.5,  0.5, 1.f / 6},
+		{ 1.f / 6,   0,    0,       0},
+	};
+	splineType = LINE;
+	M_curve.push_back(spline_Linear);
+	M_curve.push_back(spline_CardinalCubic);
+	M_curve.push_back(spline_CubicB_Spline);
 }
 
 //****************************************************************************
@@ -47,10 +73,14 @@ resetPoints()
 {
 
 	points.clear();
-	points.push_back(ControlPoint(Pnt3f(50,5,0)));
+	/*points.push_back(ControlPoint(Pnt3f(50,5,0)));
 	points.push_back(ControlPoint(Pnt3f(0,5,50)));
 	points.push_back(ControlPoint(Pnt3f(-50,5,0)));
-	points.push_back(ControlPoint(Pnt3f(0,5,-50)));
+	points.push_back(ControlPoint(Pnt3f(0,5,-50)));*/
+	points.push_back(ControlPoint(Pnt3f(25, 5, 25)));
+	points.push_back(ControlPoint(Pnt3f(-25, 20, 25)));
+	points.push_back(ControlPoint(Pnt3f(-25, 5, -25)));
+	points.push_back(ControlPoint(Pnt3f(25, 5, -25)));
 
 	// we had better put the train back at the start of the track...
 	trainU = 0.0;
@@ -173,4 +203,202 @@ writePoints(const char* filename)
 				points[i].orient.x, points[i].orient.y, points[i].orient.z);
 		fclose(fp);
 	}
+}
+
+
+//****************************************************************************
+//
+// * recompute point, normal, tangent
+//============================================================================
+void CTrack::
+computeSamplePoint()
+{
+	if (dirty == false)
+		return;
+	else
+		dirty = false;
+
+	samplePoints.resize(this->points.size());
+	normalVectors.resize(this->points.size());
+	for (int i = 0; i < (int)this->points.size(); ++i)
+	{
+		samplePoints[i].resize(DIVIDE_LINE + 1);
+		normalVectors[i].resize(DIVIDE_LINE + 1);
+	}
+	Pnt3f previousPoint(0, 0, 0);
+
+	switch (splineType)
+	{
+	case LINE:
+		
+		for (size_t i = 0; i < this->points.size(); ++i)
+		{
+			Pnt3f cp_pos_p1 = this->points[i].pos;
+			Pnt3f cp_pos_p2 = this->points[(i + 1) % this->points.size()].pos;
+			// orient
+			Pnt3f cp_orient_p1 = this->points[i].orient;
+			Pnt3f cp_orient_p2 = this->points[(i + 1) % this->points.size()].orient;
+
+			float percent = 1.0f / DIVIDE_LINE;
+			float t = 0;
+			Pnt3f qt, qt0, orient_t1, orient_t2, tangent, normal;
+
+			// 用控制點求出內差點
+			qt = (1 - t) * cp_pos_p1 + t * cp_pos_p2;
+
+			for (size_t j = 0; j < DIVIDE_LINE; j++) {
+				// 取樣點C(t)的pos跟normal
+				qt0 = (1 - t) * cp_pos_p1 + t * cp_pos_p2;
+				orient_t1 = (1 - t) * cp_orient_p1 + t * cp_orient_p2;
+				tangent = qt0 - previousPoint;
+				orient_t2 = orient_t1 * tangent;
+				normal = tangent * orient_t2;
+				normal.normalize();
+
+				samplePoints[i][j] = qt0;
+				normalVectors[i][j] = normal;
+				t += percent;
+				previousPoint = qt0;
+			}
+		}
+		break;
+	default:
+		const vector<vector<float>> &M = M_curve[splineType];
+		for (size_t i = 0; i < this->points.size(); ++i)
+		{
+			// position
+			const Pnt3f &cp_pos_p1 = this->points[i].pos;
+			const Pnt3f &cp_pos_p2 = this->points[(i + 1) % this->points.size()].pos;
+			const Pnt3f &cp_pos_p3 = this->points[(i + 2) % this->points.size()].pos;
+			const Pnt3f &cp_pos_p4 = this->points[(i + 3) % this->points.size()].pos;
+			// orient
+			const Pnt3f &cp_orient_p1 = this->points[i].orient;
+			const Pnt3f &cp_orient_p2 = this->points[(i + 1) % this->points.size()].orient;
+			const Pnt3f &cp_orient_p3 = this->points[(i + 2) % this->points.size()].orient;
+			const Pnt3f &cp_orient_p4 = this->points[(i + 3) % this->points.size()].orient;
+
+			const vector<vector<float>>
+				G = {
+					{cp_pos_p1.x,cp_pos_p2.x,cp_pos_p3.x,cp_pos_p4.x},
+					{cp_pos_p1.y,cp_pos_p2.y,cp_pos_p3.y,cp_pos_p4.y},
+					{cp_pos_p1.z,cp_pos_p2.z,cp_pos_p3.z,cp_pos_p4.z},
+			},
+			G_orient = {
+				{cp_orient_p1.x,cp_orient_p2.x,cp_orient_p3.x,cp_orient_p4.x},
+				{cp_orient_p1.y,cp_orient_p2.y,cp_orient_p3.y,cp_orient_p4.y},
+				{cp_orient_p1.z,cp_orient_p2.z,cp_orient_p3.z,cp_orient_p4.z},
+			};
+
+			float percent = 1.0f / (DIVIDE_LINE);
+			float t = 0;
+			Pnt3f qt, qt0, qt1, qt2, orient_t, cross_t, previous_qt;
+
+			vector<vector<float>>
+				T =
+			{
+				{0},
+				{0},
+				{0},
+				{1}
+			};
+			// 用控制點求出內差點
+			vector<vector<float>> qt_v = Multiply(G, Multiply(M, T));
+			qt = Pnt3f(qt_v[0][0], qt_v[1][0], qt_v[2][0]);
+
+
+			previous_qt = qt;
+			for (size_t j = 0; j < DIVIDE_LINE; j++)
+			{
+				// 處理軌道線條
+				T = {
+					{pow(t,3)},
+					{pow(t,2)},
+					{t},
+					{1}
+				};
+				qt_v = Multiply(G, Multiply(M, T));
+				qt0 = Pnt3f(qt_v[0][0], qt_v[1][0], qt_v[2][0]);
+
+				vector<vector<float>> orient_v = Multiply(G_orient, Multiply(M, T));
+				orient_t = Pnt3f(orient_v[0][0], orient_v[1][0], orient_v[2][0]);
+
+
+				samplePoints[i][j] = (qt0);
+				normalVectors[i][j] = (orient_t);
+
+				t += percent;
+			}
+			
+		}
+		break;
+	}
+
+	for (int i = 0; i < this->samplePoints.size(); i++)
+	{
+		samplePoints[i][DIVIDE_LINE] = samplePoints[(i + 1) % this->samplePoints.size()].front();
+		normalVectors[i][DIVIDE_LINE] = normalVectors[(i + 1) % this->normalVectors.size()].front();
+	}
+}
+
+void CTrack::
+computeSegmentArclength()
+{
+	segmentArclength.resize(this->points.size() - 1u);
+	int pointSize = (int)this->points.size();
+
+	for (int i = 0; i < segmentArclength.size(); i++)
+	{
+		switch (splineType)
+		{
+		case LINE:
+		{
+			segmentArclength[i] =
+				distance(this->points[i % pointSize].pos, this->points[(i + 1) % pointSize].pos);
+			break;
+		}
+		case CARDINAL:
+		{
+			Pnt3f &P1 = this->points[i % pointSize].pos;
+			Pnt3f &P2 = this->points[(i + 1) % pointSize].pos;
+			Pnt3f &P3 = this->points[(i + 2) % pointSize].pos;
+			Pnt3f &P4 = this->points[(i + 3) % pointSize].pos;
+
+			Pnt3f a = 3 * P2 - 3 * P3 - P1 + P4;
+			Pnt3f b = 3 * P1 - 6 * P2 + 3 * P3;
+			Pnt3f c = 3 * (P3 - P1);
+			Pnt3f d = P1 + 4 * P2 + P3;
+		}
+		break;
+		case B_SPLINE:
+			
+			break;
+		default:
+			break;
+		}
+		;
+		this->points[i % pointSize], this->points[(i + 1) % pointSize];
+	}
+}
+
+float distance(const Pnt3f &p1, const Pnt3f &p2)
+{
+	float x_2 = (p1.x - p2.x) * (p1.x - p2.x);
+	float y_2 = (p1.y - p2.y) * (p1.y - p2.y);
+	float z_2 = (p1.z - p2.z) * (p1.z - p2.z);
+	return sqrt(x_2 + y_2 + z_2);
+}
+vector<vector<float>> Multiply(const vector<vector<float>> &m1, const vector<vector<float>> &m2)
+{
+	vector<vector<float>> result(m1.size(), vector<float>(m2[0].size(), 0));
+	for (int i = 0; i < result.size(); i++)
+	{
+		for (int j = 0; j < result[0].size(); j++)
+		{
+			for (int k = 0; k < m1[0].size(); k++)
+			{
+				result[i][j] += m1[i][k] * m2[k][j];
+			}
+		}
+	}
+	return result;
 }

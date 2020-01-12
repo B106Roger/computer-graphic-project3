@@ -8,6 +8,8 @@
 
 
 GLuint Model::skyboxShaderID = 0;
+float Model::DEGREE_TO_RADIANT = 3.1415926f / 180.f;
+float Model::RADIANT_TO_DEGREE = 180.f / 3.1415926f;
 
 Model::Model(const QString &filePath, int s, Point3d p, ShaderType type)
 	: m_fileName(QFileInfo(filePath).fileName())
@@ -95,7 +97,7 @@ Model::Model(const QString &filePath, int s, Point3d p, ShaderType type)
 void Model::render(GLfloat P[][4], GLfloat MV[][4], bool wireframe, bool normals)
 {
 	glEnable(GL_DEPTH_TEST);
-	glEnableClientState(GL_VERTEX_ARRAY);
+	/*glEnableClientState(GL_VERTEX_ARRAY);*/
 	if (wireframe) {
 		glVertexPointer(3, GL_FLOAT, 0, (float *)m_points.data());
 		glDrawElements(GL_LINES, m_edgeIndices.size(), GL_UNSIGNED_INT, m_edgeIndices.data());
@@ -122,14 +124,13 @@ void Model::render(GLfloat P[][4], GLfloat MV[][4], bool wireframe, bool normals
 		shaderProgram->setUniformValue("inputPos", inputPos);
 		shaderProgram->setUniformValue("inputRot", inputRot);
 		shaderProgram->setUniformValue("inputConst", inputConst);
-		shaderProgram->setUniformValue("inputConst", inputConst);
-		if (shadertype == REFLECTION)
+		if (shadertype == REFLECTION || shadertype == REFRACTION)
 			shaderProgram->setUniformValue("cameraPos", eyePosition);
 
 		vvbo.bind();
 		shaderProgram->enableAttributeArray(0);
 		shaderProgram->setAttributeArray(0, GL_FLOAT, 0, 3, NULL);
-		if (shadertype == REFLECTION)
+		if (shadertype == REFLECTION || shadertype == REFRACTION)
 			glBindTexture(GL_TEXTURE_CUBE_MAP, Model::skyboxShaderID);
 		vvbo.release();
 
@@ -151,14 +152,23 @@ void Model::render(GLfloat P[][4], GLfloat MV[][4], bool wireframe, bool normals
 		glVertexPointer(3, GL_FLOAT, 0, (float *)normals.data());
 		glDrawArrays(GL_LINES, 0, normals.size());
 	}
-	glDisableClientState(GL_VERTEX_ARRAY);
+	/*glDisableClientState(GL_VERTEX_ARRAY);*/
 	glDisable(GL_DEPTH_TEST);
 }
 
 void Model::updateRotation(Point3d rotationDir, Point3d p)
 {
-	position = p;
 	rotation = rotationDir;
+	position = p;
+}
+
+void Model::updateRotation(Point3d f_position, Point3d f_tangent, Point3d f_normal)
+{
+	f_tangent = f_tangent.normalize();
+	f_normal = f_normal.normalize();
+	
+
+	position = f_position;
 }
 
 void Model::Init()

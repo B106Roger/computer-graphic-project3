@@ -19,6 +19,8 @@ enum ShaderType { NORMAL, REFLECTION, REFRACTION ,TEXTURE };
 class Model
 {
 public:
+	static float DEGREE_TO_RADIANT;
+	static float RADIANT_TO_DEGREE;
 	static GLuint skyboxShaderID;
 
 	Model() {}
@@ -35,7 +37,8 @@ public:
 	void InitVBO();
 	void InitShader(QString vertexShaderPath, QString fragmentShaderPath, QString geomoetryShaderPath);
 
-	void updateRotation(Point3d, Point3d);
+	void updateRotation(Point3d f_rotation, Point3d f_position);
+	void updateRotation(Point3d f_position, Point3d f_tangent, Point3d f_normal );
 	void setEyePosition(float x, float y, float z) { eyePosition[0] = x; eyePosition[1] = y; eyePosition[2] = z; };
 private:
 
