@@ -10,7 +10,7 @@ out vec3 TexCoords;
 void main(void)
 {	
 	TexCoords = position;
-	vec3 newpos = position * 10.f;
+	vec3 newpos = position * 200.f;
 	
 	mat4 new_model_matrix = mat4(mat3(model_matrix));
 	

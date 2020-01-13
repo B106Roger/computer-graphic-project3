@@ -49,8 +49,8 @@ void TrainView::initializeGL()
 	curve = 0;          // 軌道類別
 	DIVIDE_LINE = 80;
 	// 其他物件
-	/*spaceShip = new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 10.f, 3.f));
-	spaceShipReflection = new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 20.f, 3.f), REFLECTION);
+	spaceShip = new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 10.f, 3.f));
+	/*spaceShipReflection = new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 20.f, 3.f), REFLECTION);
 	spaceShipRefraction = new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 20.f, 3.f), REFRACTION);*/
 
 	trainList.push_back(new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 20.f, 3.f), TRAIN));
@@ -209,9 +209,8 @@ void TrainView::paintGL()
 
 	setupFloor();
 	glDisable(GL_LIGHTING);
-	water->Paint(P, MV);
+	// water->Paint(P, MV);
 	// drawFloor(200, 10);
-
 
 	// Call triangle's render function, pass ModelViewMatrex and ProjectionMatrex
 	// triangle->Paint(ProjectionMatrex, ModelViewMatrex);
@@ -287,10 +286,10 @@ setProjection()
 		// Set up the top camera drop mode to be orthogonal and set
 		// up proper projection matrix
 		glMatrixMode(GL_PROJECTION);
-		glOrtho(-wi, wi, -he, he, 200, -200);
+		glOrtho(-wi, wi, -he, he, -1000, +1000);
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
-		glRotatef(-90, 1, 0, 0);
+		glRotatef(90, 1, 0, 0);
 		update();
 	}
 	// Or do the train view or other view here
@@ -299,6 +298,33 @@ setProjection()
 	// put code for train view projection here!	
 	//####################################################################
 	else {
+		glMatrixMode(GL_PROJECTION);
+		gluPerspective(120, aspect, 1, 2000);
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		int curveIndex = this->m_pTrack->curveIndex;
+		int pointIndex = this->m_pTrack->pointIndex;
+		Pnt3f eye = this->m_pTrack->samplePoints[curveIndex][pointIndex];
+		Pnt3f normal = this->m_pTrack->normalVectors[curveIndex][pointIndex];
+		Pnt3f tangent = this->m_pTrack->samplePoints[curveIndex][pointIndex];
+		if (pointIndex == this->m_pTrack->samplePoints.front().size() - 1u)
+		{
+			pointIndex = 0;
+			curveIndex = (curveIndex + 1) % this->m_pTrack->samplePoints.size();
+		}
+		else
+		{
+			pointIndex++;
+		}
+		tangent = this->m_pTrack->samplePoints[curveIndex][pointIndex] - tangent;
+		tangent = tangent + eye;
+		normal.normalize();
+
+
+		gluLookAt(eye.x, eye.y + 10, eye.z,
+			tangent.x, tangent.y + 10, tangent.z,
+			normal.x, normal.y, normal.z
+		);
 #ifdef EXAMPLE_SOLUTION
 		trainCamView(this, aspect);
 #endif
@@ -390,11 +416,11 @@ void TrainView::drawStuff(bool doingShadows)
 	}*/
 
 	//Test shader
-	/*rotation.y = d - 90;
-	rotation.z = -16.69929;
+	rotation.y = d - 90;
+	rotation.z = 0;
 	spaceShip->updateRotation(rotation, Point3d(r * cos(d *  PI / 180.0) / 10.f, 10.f, -r * sin(d * PI / 180.0) / 10.f));
 	spaceShip->render(P, MV, false, false);
-
+	/*
 	rotation.z = 16.69929;
 	spaceShipReflection->updateRotation(rotation, Point3d(r * cos(d *  PI / 180.0) / 10.f, 20.f, -r * sin(d * PI / 180.0) / 10.f));
 	spaceShipReflection->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);

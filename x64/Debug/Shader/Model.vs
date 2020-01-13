@@ -16,8 +16,9 @@ vec3 rotationTransfer(float x, float y, float z,float sX,float sY,float sZ);
 
 void main(void)
 {	
-	vec3 newpos = (myMatrix * vec4(position, 1)).xyz;
-	
+	vec3 newpos = rotationTransfer(position.x, position.y, position.z,
+								inputRot.x, inputRot.y, inputRot.z);
+
 	newpos = (newpos + inputPos - inputConst)* scale ;
     gl_Position = proj_matrix * model_matrix * vec4(newpos, 1.0);
 	// normals = normal;
