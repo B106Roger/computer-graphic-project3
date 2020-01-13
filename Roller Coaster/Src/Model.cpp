@@ -5,6 +5,7 @@
 #include <QtCore/QVarLengthArray>
 
 #include <QtOpenGL/QtOpenGL>
+#include <QtGui/qmatrix.h>
 
 
 GLuint Model::skyboxShaderID = 0;
@@ -124,6 +125,7 @@ void Model::render(GLfloat P[][4], GLfloat MV[][4], bool wireframe, bool normals
 		shaderProgram->setUniformValue("inputPos", inputPos);
 		shaderProgram->setUniformValue("inputRot", inputRot);
 		shaderProgram->setUniformValue("inputConst", inputConst);
+		shaderProgram->setUniformValue("myMatrix", rotMatrix);
 		if (shadertype == REFLECTION || shadertype == REFRACTION)
 			shaderProgram->setUniformValue("cameraPos", eyePosition);
 
@@ -162,11 +164,81 @@ void Model::updateRotation(Point3d rotationDir, Point3d p)
 	position = p;
 }
 
+
+vector<vector<float>> rotationMatrix(QVector3D axis, float angle)
+{
+	axis.normalize();
+	float DEGREE_TO_RADIANT = 3.1415926 / 180;
+	float s = sin(angle * DEGREE_TO_RADIANT);
+	float c = cos(angle * DEGREE_TO_RADIANT);
+	float oc = 1.0 - c;
+	/*float tmp[16] = {
+		oc * axis.x * axis.x + c, oc * axis.x * axis.y - axis.z * s, oc * axis.z * axis.x + axis.y * s, 0.0,
+		oc * axis.x * axis.y + axis.z * s, oc * axis.y * axis.y + c, oc * axis.y * axis.z - axis.x * s, 0.0,
+		oc * axis.z * axis.x - axis.y * s, oc * axis.y * axis.z + axis.x * s, oc * axis.z * axis.z + c, 0.0,
+		0.0, 0.0, 0.0, 1.0
+	};*/
+	float tmp[16] = {
+		oc * axis.x() * axis.x() + c, oc * axis.x() * axis.y() - axis.z() * s, oc * axis.z() * axis.x() + axis.y() * s, 0.0,
+		oc * axis.x() * axis.y() + axis.z() * s, oc * axis.y() * axis.y() + c, oc * axis.y() * axis.z() - axis.x() * s, 0.0,
+		oc * axis.z() * axis.x() - axis.y() * s, oc * axis.y() * axis.z() + axis.x() * s, oc * axis.z() * axis.z() + c, 0.0,
+		0.0, 0.0, 0.0, 1.0
+	};
+
+	vector<vector<float>> res(4,vector<float>(4));
+	for (int i = 0; i < 4; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			res[i][j] = (tmp[i * 4 + j]);
+			int a = 0;
+		}
+	}
+	
+	return res;
+}
+
 void Model::updateRotation(Point3d f_position, Point3d f_tangent, Point3d f_normal)
 {
 	f_tangent = f_tangent.normalize();
 	f_normal = f_normal.normalize();
+	float scale = sqrt(f_tangent.x * f_tangent.x + f_tangent.z * f_tangent.z);
+	rotation.y = atan2f(f_tangent.x / scale, f_tangent.z / scale) * RADIANT_TO_DEGREE + 90.f;
+	scale = sqrt(scale * scale + f_tangent.y + f_tangent.y);
+	rotation.z = asin(f_tangent.y / scale) * RADIANT_TO_DEGREE;
+	Point3d tmp(0, 1, 0);
 	
+
+	// QVector3D newpos;
+	vector<vector<float>> axis1 = { {0}, {1}, {0}, {1} };
+	vector<vector<float>> axis2 = { {0}, {0}, {1}, {1} };
+	vector<vector<float>> axis3 = { {1}, {0}, {0}, {1} };
+
+
+	vector<vector<float>> matrix1 = rotationMatrix(QVector3D(axis1[0][0], axis1[1][0], axis1[2][0]), rotation.y);
+	axis2 = Multiply(matrix1 , axis2);
+	axis3 = Multiply(matrix1 , axis3);
+	vector<vector<float>> matrix2 = rotationMatrix(QVector3D(axis2[0][0], axis2[1][0], axis2[2][0]), rotation.z);
+	axis3 = Multiply(matrix2 , axis3);
+
+	vector<vector<float>> intermediateMatrix = Multiply(matrix2 , matrix1);
+	vector<vector<float>> intermidateNormal = Multiply(intermediateMatrix , axis1);
+	tmp.x = intermidateNormal[0][0];
+	tmp.y = intermidateNormal[1][0];
+	tmp.z = intermidateNormal[2][0];
+	//intermidateNormal.
+
+	rotation.x = asin(dot(tmp, f_normal)) * RADIANT_TO_DEGREE-90;
+
+	vector<vector<float>> matrix3 = rotationMatrix(QVector3D(axis3[0][0], axis3[1][0], axis3[2][0]), rotation.x);
+	matrix3 = Multiply(matrix3 , intermediateMatrix);
+	for (int i = 0; i < 4; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			this->rotMatrix[i][j] = matrix3[i][j];
+		}
+	}
 
 	position = f_position;
 }
@@ -185,7 +257,7 @@ void Model::Init()
 		InitShader("./Shader/Model.vs", "./Shader/Model-refraction.fs", "./Shader/Model.gs");
 		break;
 	case TRAIN:
-		InitShader("./Shader/TrainModel.vs", "./Shader/Model-refraction.fs", "./Shader/Model.gs");
+		InitShader("./Shader/TrainModel.vs", "./Shader/Model.fs", "./Shader/Model.gs");
 		break;
 	}
 	InitVAO();

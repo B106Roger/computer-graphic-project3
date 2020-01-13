@@ -49,16 +49,16 @@ void TrainView::initializeGL()
 	curve = 0;          // 軌道類別
 	DIVIDE_LINE = 80;
 	// 其他物件
-	spaceShip = new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 10.f, 3.f));
+	/*spaceShip = new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 10.f, 3.f));
 	spaceShipReflection = new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 20.f, 3.f), REFLECTION);
-	spaceShipRefraction = new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 20.f, 3.f), REFRACTION);
+	spaceShipRefraction = new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 20.f, 3.f), REFRACTION);*/
 
 	trainList.push_back(new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 20.f, 3.f), TRAIN));
 
 
 
 	//Model test
-	earth = new Model*[10];
+	/*earth = new Model*[10];
 	spaceTest = new Model*[10];
 	for (int i = 0; i < 5; i++)
 	{
@@ -69,7 +69,7 @@ void TrainView::initializeGL()
 	{
 		earth[i] = new Model("./Object/earth.obj", 50, Point3d((i - 5) * -1000, (i - 5) * 1000, 0));
 		spaceTest[i] = new Model("./Object/Kameriexplorerflying.obj", 20, Point3d((i - 5) * -1000, (i - 5) * 1000, 0));
-	}
+	}*/
 
 	// 初始化火車時間
 	t_time = 0.f;
@@ -372,7 +372,7 @@ void TrainView::drawStuff(bool doingShadows)
 
 	//Test model render
 	rotation.y = d;
-	for (int i = 0; i < 5; i++)
+	/*for (int i = 0; i < 5; i++)
 	{
 		earth[i]->render(P, MV, false, false);
 
@@ -387,10 +387,10 @@ void TrainView::drawStuff(bool doingShadows)
 		spaceTest[i]->updateRotation(rotation, Point3d(earth[i]->getPosition(0) + (r + 100) * 15* cos(d *  PI / 180.0) / 10.f, (i - 5) * 1000, -(r + 100) * 15* sin(d * PI / 180.0) / 10.f - 80.f));
 		spaceTest[i]->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
 		spaceTest[i]->render(P, MV, false, false);
-	}
+	}*/
 
 	//Test shader
-	rotation.y = d - 90;
+	/*rotation.y = d - 90;
 	rotation.z = -16.69929;
 	spaceShip->updateRotation(rotation, Point3d(r * cos(d *  PI / 180.0) / 10.f, 10.f, -r * sin(d * PI / 180.0) / 10.f));
 	spaceShip->render(P, MV, false, false);
@@ -402,7 +402,7 @@ void TrainView::drawStuff(bool doingShadows)
 
 	spaceShipRefraction->updateRotation(rotation, Point3d(r * cos(d *  PI / 180.0) / 10.f, 30.f, -r * sin(d * PI / 180.0) / 10.f));
 	spaceShipRefraction->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
-	spaceShipRefraction->render(P, MV, false, false);
+	spaceShipRefraction->render(P, MV, false, false);*/
 	
 
 

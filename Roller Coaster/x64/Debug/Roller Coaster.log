@@ -1,12 +1,2 @@
-﻿  moc_AppMain.cpp
-  moc_TrainView.cpp
-  Skybox.cpp
-  AppMain.cpp
-  TrainView.cpp
-  Water.cpp
-  main.cpp
-  TGATexture.cpp
-  正在產生程式碼...
-c:\roger\github\computer-graphic-project3\roller coaster\include\model.h(55): warning C4715: 'Model::getPosition': 不是所有控制路徑都傳回值
-  Roller Coaster.vcxproj -> C:\Roger\GitHub\computer-graphic-project3\x64\Debug\Roller Coaster.exe
-  Roller Coaster.vcxproj -> C:\Roger\GitHub\computer-graphic-project3\x64\Debug\Roller Coaster.pdb (Full PDB)
+﻿  Model.cpp
+  Roller Coaster.vcxproj -> D:\GitHub\computer-graphic-project3\x64\Debug\Roller Coaster.exe

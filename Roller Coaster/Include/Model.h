@@ -12,6 +12,8 @@
 
 #include <math.h>
 #include "point3d.h"
+#include <vector>
+using namespace std;
 
 
 enum ShaderType { NORMAL, REFLECTION, REFRACTION ,TRAIN };
@@ -65,6 +67,7 @@ private:
 	Point3d position;
 	Point3d rotation;
 
+	GLfloat rotMatrix[4][4];
 	QVector<Point3d> m_points;
 	QVector<Point3d> m_target_normals;
 	QVector<unsigned int> m_edgeIndices;
@@ -77,6 +80,22 @@ private:
 	QOpenGLShader* vertexShader;
 	QOpenGLShader* geometryShader;
 	QOpenGLShader* fragmentShader;
+
+	static vector<vector<float>> Multiply(const vector<vector<float>> &m1, const vector<vector<float>> &m2)
+	{
+		vector<vector<float>> result(m1.size(), vector<float>(m2[0].size(), 0));
+		for (int i = 0; i < result.size(); i++)
+		{
+			for (int j = 0; j < result[0].size(); j++)
+			{
+				for (int k = 0; k < m1[0].size(); k++)
+				{
+					result[i][j] += m1[i][k] * m2[k][j];
+				}
+			}
+		}
+		return result;
+	}
 };
 
 #endif
