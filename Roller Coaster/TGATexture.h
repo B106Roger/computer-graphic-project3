@@ -26,5 +26,8 @@ bool LoadTGA(TextureImage *texture, char *fileName);
 //¸ü¤JTGA skybox
 bool LoadTGAData(TextureImage *texture, char *fileName);
 
+void *file_contents(const char *filename, GLint *length);
+short le_short(unsigned char *bytes);
+void *read_tga(const char *filename, int *width, int *height);
 
 #endif
