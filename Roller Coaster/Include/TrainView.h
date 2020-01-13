@@ -115,6 +115,9 @@ public:
 	Model *spaceShipRefraction;
 	Skybox *sky;
 
+	Model **earth;
+	Model **spaceTest;
+
 
 	// **********************************
 	// ****** Particle Parameter   ******

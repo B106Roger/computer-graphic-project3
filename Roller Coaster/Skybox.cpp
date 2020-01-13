@@ -110,16 +110,16 @@ void Skybox::InitTexture()
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 
-	char filename[6][30] = {
+	char filename[6][31] = {
 		
-		"./Textures/met_ft.tga",
-		"./Textures/met_bk.tga",
+		"./Textures/purplenebula_ft.tga",
+		"./Textures/purplenebula_bk.tga",
 		
-		"./Textures/met_dn.tga",
-		"./Textures/met_up.tga",
+		"./Textures/purplenebula_dn.tga",
+		"./Textures/purplenebula_up.tga",
 		
-		"./Textures/met_rt.tga",
-		"./Textures/met_lf.tga",
+		"./Textures/purplenebula_rt.tga",
+		"./Textures/purplenebula_lf.tga",
 		
 	};
 

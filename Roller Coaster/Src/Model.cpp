@@ -184,8 +184,8 @@ void Model::Init()
 	case REFRACTION:
 		InitShader("./Shader/Model.vs", "./Shader/Model-refraction.fs", "./Shader/Model.gs");
 		break;
-	case TEXTURE:
-		InitShader("./Shader/Model.vs", "./Shader/CustomShader.fs", "./Shader/Model.gs");
+	case TRAIN:
+		InitShader("./Shader/TrainModel.vs", "./Shader/Model-refraction.fs", "./Shader/Model.gs");
 		break;
 	}
 	InitVAO();

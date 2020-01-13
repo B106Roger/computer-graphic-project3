@@ -14,7 +14,7 @@
 #include "point3d.h"
 
 
-enum ShaderType { NORMAL, REFLECTION, REFRACTION ,TEXTURE };
+enum ShaderType { NORMAL, REFLECTION, REFRACTION ,TRAIN };
 
 class Model
 {
@@ -40,6 +40,19 @@ public:
 	void updateRotation(Point3d f_rotation, Point3d f_position);
 	void updateRotation(Point3d f_position, Point3d f_tangent, Point3d f_normal );
 	void setEyePosition(float x, float y, float z) { eyePosition[0] = x; eyePosition[1] = y; eyePosition[2] = z; };
+
+	float getPosition(int i)
+	{
+		switch (i)
+		{
+		case 0:
+			return position.x;
+		case 1:
+			return position.y;
+		case 2:
+			return position.z;
+		}
+	};
 private:
 
 	ShaderType shadertype;
