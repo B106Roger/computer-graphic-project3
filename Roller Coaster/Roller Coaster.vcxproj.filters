@@ -120,6 +120,9 @@
     <CustomBuild Include="Include\TrainView.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="AppMain.ui">
+      <Filter>Generated Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Utilities\Pnt3f.H">
@@ -166,6 +169,9 @@
     </ClInclude>
     <ClInclude Include="Skybox.h">
       <Filter>Header Files\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_AppMain.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

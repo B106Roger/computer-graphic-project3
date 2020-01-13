@@ -77,8 +77,9 @@ private:
 		void ChangeTrackToRoad();
 
 		void SwitchPlayAndPause();
+	public slots:
 		void ChangeSpeedOfTrain( int val );
-
+	private slots:
 		void AddControlPoint();
 		void DeleteControlPoint();
 
@@ -86,6 +87,9 @@ private:
 		void RotateControlPointSubX();
 		void RotateControlPointAddZ();
 		void RotateControlPointSubZ();
+
+		void AddTrain();
+		void SubTrain();
 
 		void setTrackDirty(const char*);
 protected:

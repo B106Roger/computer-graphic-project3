@@ -43,17 +43,19 @@ void TrainView::initializeGL()
 	grav = 0.00003f;
 	nOfFires = 0;
 	Tick1 = Tick2 = GetTickCount();
+	AppMain::getInstance()->ChangeSpeedOfTrain(50);
 	Particles = NULL;
 
 	// 軌道參數
 	curve = 0;          // 軌道類別
-	DIVIDE_LINE = 80;
 	// 其他物件
 	spaceShip = new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 10.f, 3.f));
 	/*spaceShipReflection = new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 20.f, 3.f), REFLECTION);
 	spaceShipRefraction = new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 20.f, 3.f), REFRACTION);*/
 
-	trainList.push_back(new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 20.f, 3.f), TRAIN));
+	TrainItem item(0,0,true);
+	item.train = new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 20.f, 3.f), TRAIN);
+	trainList.push_back(item);
 
 
 
@@ -519,37 +521,37 @@ drawTrack(bool doingShadows)
 void TrainView::
 drawTrain(float t)
 {
-	int curveIndex = this->m_pTrack->curveIndex;
-	int pointIndex = this->m_pTrack->pointIndex;
+	
 
-	Pnt3f _normal = this->m_pTrack->normalVectors[curveIndex][pointIndex];
-	Pnt3f _sample1 = this->m_pTrack->samplePoints[curveIndex][pointIndex];
-	Pnt3f _sample2;
-	if (pointIndex == (int)this->m_pTrack->samplePoints[curveIndex].size() - 1)
-		// 這裡有bug, 因為第一條曲線的最後一個點跟第二條曲線的第一個點一樣, 所以計算出的tangent=0,0,0
-		_sample2 = this->m_pTrack->
-		samplePoints[(curveIndex + 1) % this->m_pTrack->samplePoints.size()][1];
-	else
-		_sample2 = this->m_pTrack->samplePoints[curveIndex][pointIndex + 1];
-
-	Point3d normal = Point3d(_normal.x, _normal.y, _normal.z);
-	Point3d sample1 = Point3d(_sample1.x, _sample1.y, _sample1.z);
-	Point3d sample2 = Point3d(_sample2.x, _sample2.y, _sample2.z);
+	
 	GLfloat MV[4][4];
 	GLfloat P[4][4];
 	DimensionTransformation(ModelViewMatrex, MV);
 	DimensionTransformation(ProjectionMatrex, P);
 
-	Point3d tangent = sample2 - sample1;
-	for (Model* model : trainList)
+	
+	for (TrainItem item: trainList)
 	{
-		model->setEyePosition(-arcball.eyeX, -arcball.eyeY, -arcball.eyeZ);
-		if (pointIndex >= 80)
-			model->updateRotation(sample1, tangent, normal);
+		int curveIndex = item.curveIndex;
+		int pointIndex = item.pointIndex;
+		Pnt3f _normal = this->m_pTrack->normalVectors[curveIndex][pointIndex];
+		Pnt3f _sample1 = this->m_pTrack->samplePoints[curveIndex][pointIndex];
+		Pnt3f _sample2;
+		if (pointIndex == (int)this->m_pTrack->samplePoints[curveIndex].size() - 1)
+			// 這裡有bug, 因為第一條曲線的最後一個點跟第二條曲線的第一個點一樣, 所以計算出的tangent=0,0,0
+			_sample2 = this->m_pTrack->samplePoints[(curveIndex + 1) % this->m_pTrack->samplePoints.size()][1];
 		else
-			model->updateRotation(sample1, tangent, normal);
-		model->render(P, MV);
-		
+			_sample2 = this->m_pTrack->samplePoints[curveIndex][pointIndex + 1];
+
+		Point3d normal = Point3d(_normal.x, _normal.y, _normal.z);
+		Point3d sample1 = Point3d(_sample1.x, _sample1.y, _sample1.z);
+		Point3d sample2 = Point3d(_sample2.x, _sample2.y, _sample2.z);
+		Point3d tangent = sample2 - sample1;
+
+
+		item.train->setEyePosition(-arcball.eyeX, -arcball.eyeY, -arcball.eyeZ);
+		item.train->updateRotation(sample1, tangent, normal);
+		item.train->render(P, MV);
 	}
 }
 

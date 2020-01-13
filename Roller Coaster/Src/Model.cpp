@@ -94,6 +94,19 @@ Model::Model(const QString &filePath, int s, Point3d p, ShaderType type)
 	shadertype = type;
 	Init();
 }
+Model::Model(Model* copyVersion)
+{
+	shadertype = copyVersion->shadertype;
+	boundsMin = copyVersion->boundsMin;
+	boundsMax = copyVersion->boundsMax;
+	scale = copyVersion->scale;
+	m_points = copyVersion->m_points;
+	m_edgeIndices = copyVersion->m_edgeIndices;
+	m_pointIndices = copyVersion->m_pointIndices;
+	shaderProgram = copyVersion->shaderProgram;
+	InitVAO();
+	InitVBO();
+}
 
 void Model::render(GLfloat P[][4], GLfloat MV[][4], bool wireframe, bool normals)
 {

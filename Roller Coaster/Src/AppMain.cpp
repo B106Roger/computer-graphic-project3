@@ -52,6 +52,9 @@ AppMain::AppMain(QWidget *parent)
 	connect( ui.rcpxsub		,SIGNAL(clicked()),this,SLOT(RotateControlPointSubX())				);
 	connect( ui.rcpzadd		,SIGNAL(clicked()),this,SLOT(RotateControlPointAddZ())					);
 	connect( ui.rcpzsub		,SIGNAL(clicked()),this,SLOT(RotateControlPointSubZ())				);
+
+	connect(ui.tradd, SIGNAL(clicked()), this, SLOT(AddTrain()));
+	connect(ui.trsub, SIGNAL(clicked()), this, SLOT(SubTrain()));
 }
 
 AppMain::~AppMain()
@@ -155,6 +158,52 @@ AppMain * AppMain::getInstance()
 	}
 	else 
 		return Instance;
+}
+
+void AppMain::AddTrain()
+{
+	TrainItem tmp = this->trainview->trainList.back();
+	float accuDist = 0.f;
+	Pnt3f previous = this->trainview->m_pTrack->samplePoints[tmp.curveIndex][tmp.pointIndex];
+
+	int newPointIndex = tmp.pointIndex - 1;
+	int newCurveIndex = tmp.curveIndex;
+	while (accuDist < 15.f)
+	{
+		
+		if (newPointIndex < 0)
+		{
+			newPointIndex = CTrack::DIVIDE_LINE - 1;
+			newCurveIndex -= 1;
+			if (newCurveIndex < 0)
+			{
+				newCurveIndex = (int)this->trainview->m_pTrack->samplePoints.size() - 1;
+			}
+		}
+		Pnt3f current = this->trainview->m_pTrack->samplePoints[newCurveIndex][newPointIndex];
+		float dx2 = (current.x - previous.x) * (current.x - previous.x);
+		float dy2 = (current.y - previous.y) * (current.y - previous.y);
+		float dz2 = (current.z - previous.z) * (current.z - previous.z);
+
+		accuDist += sqrt(dx2 + dy2 + dz2);
+
+		previous = current;
+		newPointIndex--;
+	}
+	newPointIndex++;
+	TrainItem newItem(newCurveIndex, newPointIndex, false);
+	newItem.train = new Model(this->trainview->trainList.front().train);
+	this->trainview->trainList.push_back(newItem);
+}
+
+void AppMain::SubTrain()
+{
+	if (this->trainview->trainList.size() == 1u) return;
+	else {
+		delete this->trainview->trainList.back().train;
+		this->trainview->trainList.pop_back();
+	}
+
 }
 
 void AppMain::ToggleMenuBar()
@@ -305,7 +354,7 @@ void AppMain::SwitchPlayAndPause()
 
 void AppMain::ChangeSpeedOfTrain( int val )
 {
-	//m_rollerCoaster->trainSpeed = m_rollerCoaster->MAX_TRAIN_SPEED * float(val) / 100.0f;
+	this->trainview->speed = 20.f + val * 0.8f;
 }
 
 void AppMain::AddControlPoint()
@@ -496,26 +545,45 @@ advanceTrain(float dir)
 	// TODO: make this work for your train
 	//#####################################################################
 	if (this->trainview->isrun) {
-		trainview->t_time += (dir / m_Track.points.size() / (trainview->DIVIDE_LINE / trainview->TRAIN_SPEED));
-		if (trainview->t_time > 1.0f)
-			trainview->t_time -= 1.0f;
+		
 
 		if (this->trainview->isrun) {
 			if (clock() - lastRedraw > CLOCKS_PER_SEC / 30) {
 				lastRedraw = clock();
-				// this->advanceTrain();
+
 				this->damageMe();
-
-				if (this->trainview->m_pTrack->pointIndex < this->trainview->m_pTrack->samplePoints.front().size() - 1u)
+				float targetDistance = this->trainview->speed / 30.f;
+				
+				for (TrainItem &item : this->trainview->trainList)
 				{
-					this->trainview->m_pTrack->pointIndex++;
-				}
-				else
-				{
-					this->trainview->m_pTrack->curveIndex += 1;
-					this->trainview->m_pTrack->pointIndex = 0;
-					this->trainview->m_pTrack->curveIndex = this->trainview->m_pTrack->curveIndex % this->trainview->m_pTrack->samplePoints.size();
+					float accuDist = 0.f;
+					int newPointIndex = item.pointIndex, newCurveIndex = item.curveIndex;
+					Pnt3f previous = this->trainview->m_pTrack->samplePoints[newCurveIndex][newPointIndex];
+					while (accuDist < targetDistance)
+					{
 
+						if (newPointIndex > CTrack::DIVIDE_LINE - 1)
+						{
+							newPointIndex = 0;
+							newCurveIndex += 1;
+							if (newCurveIndex > (int)this->trainview->m_pTrack->samplePoints.size() - 1)
+							{
+								newCurveIndex = 0;
+							}
+						}
+						Pnt3f current = this->trainview->m_pTrack->samplePoints[newCurveIndex][newPointIndex];
+						float dx2 = (current.x - previous.x) * (current.x - previous.x);
+						float dy2 = (current.y - previous.y) * (current.y - previous.y);
+						float dz2 = (current.z - previous.z) * (current.z - previous.z);
+
+						accuDist += sqrt(dx2 + dy2 + dz2);
+
+						previous = current;
+						newPointIndex++;
+					}
+					newPointIndex--;
+					item.curveIndex = newCurveIndex;
+					item.pointIndex = newPointIndex;
 				}
 			}
 		}

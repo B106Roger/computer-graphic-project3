@@ -78,10 +78,11 @@ class CTrack {
 
 		vector<int> segmentNumber;
 		vector<float> segmentArclength;
+		static const int DIVIDE_LINE;
+		static const int SAMPLE_NUMBER;
 	private:
 		vector<vector<vector<float>>> M_curve;
-		const int DIVIDE_LINE = 80;
-		const int SAMPLE_NUMBER = 10000;
+		
 
 };
 float distance(const Pnt3f &p1, const Pnt3f &p2);

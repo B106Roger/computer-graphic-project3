@@ -27,7 +27,7 @@ public:
 
 	Model() {}
 	Model(const QString &filePath, int s, Point3d p, ShaderType type = NORMAL);
-
+	Model(Model*);
 
 	void render(GLfloat P[][4], GLfloat MV[][4], bool wireframe = false, bool normals = false);
 	QString fileName() const { return m_fileName; }

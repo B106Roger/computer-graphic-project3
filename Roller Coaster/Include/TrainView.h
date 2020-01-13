@@ -48,6 +48,20 @@ typedef struct tag_PARTICLE
 // be drawn, or adjust the lighting, or ...
 //#######################################################################
 
+struct TrainItem
+{
+	Model * train;
+	int curveIndex;
+	int pointIndex;
+	bool isHead;
+	TrainItem(int curveInt, int pointInt, bool head, Model *tr = NULL)
+	{
+		curveIndex = curveInt;
+		pointIndex = pointInt;
+		head = isHead;
+		train = tr;
+	}
+};
 
 class TrainView : public QGLWidget, protected QOpenGLFunctions_4_3_Core
 {  
@@ -90,6 +104,7 @@ public:
 	int camera;
 	int curve;
 	int track;
+	float speed;
 	bool isrun;
 	vector<vector<vector<float>>> M_curve;
 
@@ -105,7 +120,7 @@ public:
 	const float RAIL_WIDTH = 2.f;
 	float TRAIN_SPEED;
 	void drawTrain(float);
-	vector<Model*> trainList;
+	vector<TrainItem> trainList;
 	
 	// **********************************
 	// ********** 其他小物件   **********
