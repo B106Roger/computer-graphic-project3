@@ -1,2 +1,8 @@
-﻿  TrainView.cpp
-  Roller Coaster.vcxproj -> C:\Users\Brian\Documents\GitHub\computer-graphic-project3\x64\Debug\Roller Coaster.exe
+﻿  Moc'ing TrainView.h...
+  moc_AppMain.cpp
+  moc_TrainView.cpp
+  AppMain.cpp
+  main.cpp
+  TrainView.cpp
+  正在產生程式碼...
+  Roller Coaster.vcxproj -> D:\GitHub\computer-graphic-project3\x64\Debug\Roller Coaster.exe

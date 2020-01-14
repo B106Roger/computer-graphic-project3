@@ -55,6 +55,7 @@ AppMain::AppMain(QWidget *parent)
 
 	connect(ui.tradd, SIGNAL(clicked()), this, SLOT(AddTrain()));
 	connect(ui.trsub, SIGNAL(clicked()), this, SLOT(SubTrain()));
+	connect(ui.Tire, SIGNAL(clicked()), this, SLOT(ToggleTire()));
 }
 
 AppMain::~AppMain()
@@ -204,6 +205,11 @@ void AppMain::SubTrain()
 		this->trainview->trainList.pop_back();
 	}
 
+}
+
+void AppMain::ToggleTire()
+{
+	this->trainview->isTire = !this->trainview->isTire;
 }
 
 void AppMain::ToggleMenuBar()

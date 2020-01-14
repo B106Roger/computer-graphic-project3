@@ -28,7 +28,7 @@ void main()
 	float tex_y = 0.5 - (switchPos.z + time/25.0) / 5.0;
 	texture_coord = vec2(tex_x, tex_y);
 
-	vec3 eyePos = vec3(0.0, 0.0, 5.0);
+	vec3 eyePos = vec3(0.0, 0.0, -50.0);
 	vec3 lightPos = vec3(1.0, 3.0, 1.0);
 	vec3 ptVertex = vec3(modelViewMat * vec4(switchPos, 1.0));
 

@@ -6,7 +6,7 @@
 
 #include <QtOpenGL/QtOpenGL>
 #include <QtGui/qmatrix.h>
-#define DEBUG_FLAG
+//#define DEBUG_FLAG
 
 GLuint Model::skyboxShaderID = 0;
 float Model::DEGREE_TO_RADIANT = 3.1415926f / 180.f;

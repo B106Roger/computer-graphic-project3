@@ -109,6 +109,7 @@ public:
 	int track;
 	float speed;
 	bool isrun;
+	bool isTire;
 	vector<vector<vector<float>>> M_curve;
 
 	Triangle* triangle;

@@ -75,12 +75,8 @@ resetPoints()
 {
 
 	points.clear();
-	/*points.push_back(ControlPoint(Pnt3f(50,5,0)));
-	points.push_back(ControlPoint(Pnt3f(0,5,50)));
-	points.push_back(ControlPoint(Pnt3f(-50,5,0)));
-	points.push_back(ControlPoint(Pnt3f(0,5,-50)));*/
 	points.push_back(ControlPoint(Pnt3f(25, 5, 25)));
-	points.push_back(ControlPoint(Pnt3f(-25, 10, 25)));
+	points.push_back(ControlPoint(Pnt3f(-25, 5, 25)));
 	points.push_back(ControlPoint(Pnt3f(-25, 5, -25)));
 	points.push_back(ControlPoint(Pnt3f(25, 5, -25)));
 

@@ -112,6 +112,9 @@
     <ClCompile Include="Src\Mountain.cpp">
       <Filter>Source Files\Object</Filter>
     </ClCompile>
+    <ClCompile Include="Src\GerstnerWater.cpp">
+      <Filter>Source Files\Object</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="AppMain.qrc">
@@ -177,6 +180,9 @@
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\Mountain.h">
+      <Filter>Header Files\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\GerstnerWater.h">
       <Filter>Header Files\Object</Filter>
     </ClInclude>
   </ItemGroup>

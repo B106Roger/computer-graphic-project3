@@ -79,6 +79,7 @@ private:
 		void SwitchPlayAndPause();
 	public slots:
 		void ChangeSpeedOfTrain( int val );
+		void ToggleTire();
 	private slots:
 		void AddControlPoint();
 		void DeleteControlPoint();

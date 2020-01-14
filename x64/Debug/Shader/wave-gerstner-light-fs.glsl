@@ -43,5 +43,5 @@ void main()
 	specular = materSpecular * lightSpecular;
 	
 	vec4 final = NdotL * (diffuse + specular * S) + globalAmt;
-	FragColor = final;
+	FragColor = texture2D(textures, texture_coord);//final;
 }

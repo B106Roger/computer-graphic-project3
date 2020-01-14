@@ -56,14 +56,14 @@ void GerstnerWater::Paint(GLfloat P[][4], GLfloat MV[][4])
 	shaderProgram->setUniformValue("modelViewMat", MV);
 
 	vvbo.bind();
-	vvbo.allocate(vertex_data, 23700);
+	vvbo.allocate(vertex_data, DATA_LENGTH * 3);
 	shaderProgram->enableAttributeArray(0);
 	shaderProgram->setAttributeArray(0, GL_FLOAT, 0, 3, NULL);
 
 	vvbo.release();
 
 	nvbo.bind();
-	nvbo.allocate(normal_data, 23700);
+	nvbo.allocate(normal_data, DATA_LENGTH * 3);
 	shaderProgram->enableAttributeArray(1);
 	shaderProgram->setAttributeArray(1, GL_FLOAT, 0, 3, NULL);
 	nvbo.release();
@@ -187,30 +187,30 @@ void GerstnerWater::InitShader(QString vertexShaderPath, QString fragmentShaderP
 }
 void GerstnerWater::initWave(void)
 {
-
+	//Initialize values{}
+	values.time = 0.0;
+	for (int w = 0; w < WAVE_COUNT; w++)
 	{
-		//Initialize values{}
-		values.time = 0.0;
-		for (int w = 0; w<WAVE_COUNT; w++)
-		{
-			values.wave_length[w] = wave_para[w][0];
-			values.wave_height[w] = wave_para[w][1];
-			values.wave_dir[w] = wave_para[w][2];
-			values.wave_speed[w] = wave_para[w][3];
-			values.wave_start[w * 2] = wave_para[w][4];
-			values.wave_start[w * 2 + 1] = wave_para[w][5];
-		}
+		values.wave_length[w] = wave_para[w][0];
+		values.wave_height[w] = wave_para[w][1];
+		values.wave_dir[w] = wave_para[w][2];
+		values.wave_speed[w] = wave_para[w][3];
+		values.wave_start[w * 2] = wave_para[w][4];
+		values.wave_start[w * 2 + 1] = wave_para[w][5];
+	}
 
-		//Initialize pt_strip[]
-		int index = 0;
-		for (int i = 0; i<STRIP_COUNT; i++)
+	//Initialize pt_strip[]
+	int index = 0;
+	for (int i = 0; i < STRIP_COUNT; i++)
+	{
+		for (int j = 0; j < STRIP_LENGTH; j++)
 		{
-			for (int j = 0; j<STRIP_LENGTH; j++)
-			{
-				pt_strip[index] = START_X + i*LENGTH_X;
-				pt_strip[index + 1] = START_Y + j*LENGTH_Y;
-				index += 3;
-			}
+			pt_strip[index] = START_X + i * LENGTH_X;
+			pt_strip[index + 1] = START_Y + j * LENGTH_Y;
+			if (pt_strip[index] == 0)
+				int a = 0;
+			index += 3;
+
 		}
 	}
 }

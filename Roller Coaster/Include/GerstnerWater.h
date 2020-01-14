@@ -17,19 +17,19 @@
 
 #include <QtOpenGL/QtOpenGL>
 
-#define START_X		0//-4.0
-#define START_Y		0//-2.5
-#define START_Z		0
-#define LENGTH_X	1//0.1
-#define LENGTH_Y	1//0.1
+const int START_X = 80;//-4.0
+const int START_Y = 0;//-2.5
+const int START_Z = 0;
+const int LENGTH_X = 1;//0.1
+const int LENGTH_Y = 1;//0.1
 
-#define HEIGHT_SCALE	1.6
+const int HEIGHT_SCALE = 1.6;
 
-#define WAVE_COUNT		6
+const int WAVE_COUNT = 3;
 
-#define STRIP_COUNT		80
-#define STRIP_LENGTH	30
-#define DATA_LENGTH		STRIP_LENGTH*2*(STRIP_COUNT-1)
+const int STRIP_COUNT = 40;
+const int STRIP_LENGTH = 10;
+const int DATA_LENGTH = STRIP_LENGTH * 2 * (STRIP_COUNT - 1);
 
 
 
