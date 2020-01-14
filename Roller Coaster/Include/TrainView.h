@@ -82,6 +82,7 @@ public:
 	// we're drawing shadows (no colors, for example)
 	void drawStuff(bool doingShadows=false);
 	void drawTrack(bool doingShadows = false);
+	void drawTurrnel();
 	void DrawParticles();
 	// setup the projection - assuming that the projection stack has been
 	// cleared for you

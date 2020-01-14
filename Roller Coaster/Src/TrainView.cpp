@@ -199,7 +199,7 @@ void TrainView::paintGL()
 	glLightfv(GL_LIGHT2, GL_POSITION, lightPosition3);
 	glLightfv(GL_LIGHT2, GL_DIFFUSE, blueLight);
 
-
+	this->drawTurrnel();
 
 	//*********************************************************************
 	// now draw the ground plane
@@ -551,7 +551,6 @@ void TrainView::drawStuff(bool doingShadows)
 		break;
 	}
 
-
 #ifdef EXAMPLE_SOLUTION
 	// don't draw the train if you're looking out the front window
 	if (!tw->trainCam->value())
@@ -699,6 +698,39 @@ drawTrain(float t)
 		}
 	}
 }
+
+void TrainView::
+drawTurrnel()
+{
+	glBegin(GL_QUADS);
+
+	glColor3ub(0, 255, 0);
+	glVertex3f(-25, 15, 55);
+	glVertex3f(-40, 15, 55);
+	glVertex3f(-40, 0, 55);
+	glVertex3f(-25, 0, 55);
+
+	glColor3ub(0, 0, 255);
+	glVertex3f(-40, 15, 35);
+	glVertex3f(-25, 15, 35);
+	glVertex3f(-25, 0, 35);
+	glVertex3f(-40, 0, 35);
+
+	glColor3ub(255, 0, 0);
+	glVertex3f(-40, 15, 35);
+	glVertex3f(-25, 15, 35);
+	glVertex3f(-25, 15, 55);
+	glVertex3f(-40, 15, 55);
+
+	glColor3ub(155, 155, 155);
+	glVertex3f(-40, 0, 35);
+	glVertex3f(-25, 0, 35);
+	glVertex3f(-25, 0, 55);
+	glVertex3f(-40, 0, 55);
+
+	glEnd();
+}
+
 
 void TrainView::
 doPick(int mx, int my)
