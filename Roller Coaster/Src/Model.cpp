@@ -192,10 +192,25 @@ vector<vector<float>> rotationMatrix(QVector3D axis, float angle)
 		0.0, 0.0, 0.0, 1.0
 	};*/
 	float tmp[16] = {
-		oc * axis.x() * axis.x() + c, oc * axis.x() * axis.y() - axis.z() * s, oc * axis.z() * axis.x() + axis.y() * s, 0.0,
-		oc * axis.x() * axis.y() + axis.z() * s, oc * axis.y() * axis.y() + c, oc * axis.y() * axis.z() - axis.x() * s, 0.0,
-		oc * axis.z() * axis.x() - axis.y() * s, oc * axis.y() * axis.z() + axis.x() * s, oc * axis.z() * axis.z() + c, 0.0,
-		0.0, 0.0, 0.0, 1.0
+		oc * axis.x() * axis.x() + c, 
+		oc * axis.x() * axis.y() - axis.z() * s,
+		oc * axis.z() * axis.x() + axis.y() * s,
+		0.0,
+
+		oc * axis.x() * axis.y() + axis.z() * s,
+		oc * axis.y() * axis.y() + c, 
+		oc * axis.y() * axis.z() - axis.x() * s,
+		0.0,
+
+		oc * axis.z() * axis.x() - axis.y() * s,
+		oc * axis.y() * axis.z() + axis.x() * s,
+		oc * axis.z() * axis.z() + c,
+		0.0,
+
+		0.0,
+		0.0,
+		0.0,
+		1.0
 	};
 
 	vector<vector<float>> res(4,vector<float>(4));
@@ -217,43 +232,84 @@ void Model::updateRotation(Point3d f_position, Point3d f_tangent, Point3d f_norm
 	f_normal = f_normal.normalize();
 	float scale = sqrt(f_tangent.x * f_tangent.x + f_tangent.z * f_tangent.z);
 	rotation.y = atan2f(f_tangent.x / scale, f_tangent.z / scale) * RADIANT_TO_DEGREE + 90.f;
-	scale = sqrt(scale * scale + f_tangent.y + f_tangent.y);
-	rotation.z = asin(f_tangent.y / scale) * RADIANT_TO_DEGREE;
-	Point3d tmp(0, 1, 0);
-	
-
-	// QVector3D newpos;
-	vector<vector<float>> axis1 = { {0}, {1}, {0}, {1} };
-	vector<vector<float>> axis2 = { {0}, {0}, {1}, {1} };
-	vector<vector<float>> axis3 = { {1}, {0}, {0}, {1} };
-
-
-	vector<vector<float>> matrix1 = rotationMatrix(QVector3D(axis1[0][0], axis1[1][0], axis1[2][0]), rotation.y);
-	axis2 = Multiply(matrix1 , axis2);
-	axis3 = Multiply(matrix1 , axis3);
-	vector<vector<float>> matrix2 = rotationMatrix(QVector3D(axis2[0][0], axis2[1][0], axis2[2][0]), rotation.z);
-	axis3 = Multiply(matrix2 , axis3);
-
-	vector<vector<float>> intermediateMatrix = Multiply(matrix2 , matrix1);
-	vector<vector<float>> intermidateNormal = Multiply(intermediateMatrix , axis1);
-	tmp.x = intermidateNormal[0][0];
-	tmp.y = intermidateNormal[1][0];
-	tmp.z = intermidateNormal[2][0];
-	//intermidateNormal.
-
-	rotation.x = asin(dot(tmp, f_normal)) * RADIANT_TO_DEGREE-90;
-
-	vector<vector<float>> matrix3 = rotationMatrix(QVector3D(axis3[0][0], axis3[1][0], axis3[2][0]), rotation.x);
-	matrix3 = Multiply(matrix3 , intermediateMatrix);
-	for (int i = 0; i < 4; i++)
+	if (rotation.y >= -90&& rotation.y<45)
 	{
-		for (int j = 0; j < 4; j++)
+		scale = sqrt(scale * scale + f_tangent.y + f_tangent.y);
+		rotation.x = asin(f_tangent.y / scale) * RADIANT_TO_DEGREE;
+		Point3d tmp(0, 1, 0);
+
+
+		// QVector3D newpos;
+		vector<vector<float>> axis1 = { {0}, {1}, {0}, {1} };
+		vector<vector<float>> axis3 = { {0}, {0}, {1}, {1} };
+		vector<vector<float>> axis2 = { {1}, {0}, {0}, {1} };
+
+
+		vector<vector<float>> matrix1 = rotationMatrix(QVector3D(axis1[0][0], axis1[1][0], axis1[2][0]), rotation.y);
+		axis2 = Multiply(matrix1, axis2);
+		axis3 = Multiply(matrix1, axis3);
+		vector<vector<float>> matrix2 = rotationMatrix(QVector3D(axis2[0][0], axis2[1][0], axis2[2][0]), rotation.x);
+		axis3 = Multiply(matrix2, axis3);
+
+		vector<vector<float>> intermediateMatrix = Multiply(matrix2, matrix1);
+		vector<vector<float>> intermidateNormal = Multiply(intermediateMatrix, axis1);
+		tmp.x = intermidateNormal[0][0];
+		tmp.y = intermidateNormal[1][0];
+		tmp.z = intermidateNormal[2][0];
+		//intermidateNormal.
+
+		rotation.z = asin(dot(tmp, f_normal)) * RADIANT_TO_DEGREE - 90;
+
+		vector<vector<float>> matrix3 = rotationMatrix(QVector3D(axis3[0][0], axis3[1][0], axis3[2][0]), rotation.z);
+		matrix3 = Multiply(matrix3, intermediateMatrix);
+		for (int i = 0; i < 4; i++)
 		{
-			this->rotMatrix[i][j] = matrix3[i][j];
+			for (int j = 0; j < 4; j++)
+			{
+				this->rotMatrix[i][j] = matrix3[i][j];
+			}
+		}
+	}
+	else
+	{
+		scale = sqrt(scale * scale + f_tangent.y + f_tangent.y);
+		rotation.z = asin(f_tangent.y / scale) * RADIANT_TO_DEGREE;
+		Point3d tmp(0, 1, 0);
+
+
+		// QVector3D newpos;
+		vector<vector<float>> axis1 = { {0}, {1}, {0}, {1} };
+		vector<vector<float>> axis2 = { {0}, {0}, {1}, {1} };
+		vector<vector<float>> axis3 = { {1}, {0}, {0}, {1} };
+
+
+		vector<vector<float>> matrix1 = rotationMatrix(QVector3D(axis1[0][0], axis1[1][0], axis1[2][0]), rotation.y);
+		axis2 = Multiply(matrix1, axis2);
+		axis3 = Multiply(matrix1, axis3);
+		vector<vector<float>> matrix2 = rotationMatrix(QVector3D(axis2[0][0], axis2[1][0], axis2[2][0]), rotation.z);
+		axis3 = Multiply(matrix2, axis3);
+
+		vector<vector<float>> intermediateMatrix = Multiply(matrix2, matrix1);
+		vector<vector<float>> intermidateNormal = Multiply(intermediateMatrix, axis1);
+		tmp.x = intermidateNormal[0][0];
+		tmp.y = intermidateNormal[1][0];
+		tmp.z = intermidateNormal[2][0];
+		//intermidateNormal.
+
+		rotation.x = asin(dot(tmp, f_normal)) * RADIANT_TO_DEGREE - 90;
+
+		vector<vector<float>> matrix3 = rotationMatrix(QVector3D(axis3[0][0], axis3[1][0], axis3[2][0]), rotation.x);
+		matrix3 = Multiply(matrix3, intermediateMatrix);
+		for (int i = 0; i < 4; i++)
+		{
+			for (int j = 0; j < 4; j++)
+			{
+				this->rotMatrix[i][j] = matrix3[i][j];
+			}
 		}
 	}
 
-	position = f_position;
+	position = Point3d(f_position.x,f_position.y+3,f_position.z);
 }
 
 void Model::Init()
