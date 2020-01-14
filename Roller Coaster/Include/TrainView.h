@@ -4,6 +4,7 @@
 #include <QtGui>  
 #include <QtOpenGL>  
 #include <GL/GLU.h>
+#include <QtMultimedia/QMediaPlayer>
 #pragma comment(lib,"opengl32.lib")
 #pragma comment(lib,"glu32.lib") 
 #include "Utilities/ArcBallCam.H"
@@ -102,6 +103,7 @@ public:
 	int				selectedCube;  // simple - just remember which cube is selected
 
 	CTrack*			m_pTrack;		// The track of the entire scene
+	QMediaPlayer* DJ;
 	int camera;
 	int curve;
 	int track;

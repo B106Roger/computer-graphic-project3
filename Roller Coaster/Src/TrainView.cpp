@@ -1,5 +1,6 @@
 ﻿#include "TrainView.h"  
 #include <QtMultimedia/QMediaPlayer>
+#include <QtMultimedia/QMediaPlaylist>
 #include <assert.h>
 #include "AppMain.h"
 
@@ -62,6 +63,16 @@ void TrainView::initializeGL()
 	trainList.push_back(item);
 
 
+	//音樂
+	QMediaPlaylist* playlist = new QMediaPlaylist();
+	playlist->addMedia(QUrl("./Music/StarWar.mp3"));
+	playlist->setPlaybackMode(QMediaPlaylist::Loop);
+
+	DJ = new QMediaPlayer;
+	//player->setMedia(QUrl(QUrl::fromLocalFile("./Music/bgm.mp3")));
+	DJ->setPlaylist(playlist);
+	DJ->setVolume(50);
+	DJ->play();
 
 	//Model test
 	/*earth = new Model*[10];
