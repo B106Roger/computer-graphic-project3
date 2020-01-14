@@ -109,6 +109,9 @@
     <ClCompile Include="Skybox.cpp">
       <Filter>Source Files\Object</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Mountain.cpp">
+      <Filter>Source Files\Object</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="AppMain.qrc">
@@ -172,6 +175,9 @@
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_AppMain.h">
       <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Mountain.h">
+      <Filter>Header Files\Object</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

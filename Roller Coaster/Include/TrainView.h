@@ -14,6 +14,7 @@
 #include "Model.h"
 #include "Water.h"
 #include "Skybox.h"
+#include "Mountain.h"
 
 
 
@@ -129,6 +130,7 @@ public:
 	Model *spaceShipReflection;
 	Model *spaceShipRefraction;
 	Skybox *sky;
+	Mountain * mountain;
 
 	Model **earth;
 	Model **spaceTest;

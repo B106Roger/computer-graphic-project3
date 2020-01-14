@@ -28,6 +28,10 @@ void TrainView::initializeGL()
 	water = new Water();
 	water->Init();
 
+	//Create Mountain object
+	mountain = new Mountain(100,100,Point3d(100,0,0), "./Textures/mountain_hieght_map.jfif","./Textures/mountain_rock.jfif");
+	mountain->Init();
+
 	//Create a skybox object
 	sky = new Skybox();
 	sky->Init();
@@ -110,6 +114,7 @@ void TrainView::initializeTexture()
 {
 	//Load and create a texture for square;'stexture
 	QOpenGLTexture* texture = new QOpenGLTexture(QImage("./Textures/Tupi.bmp"));
+	
 	Textures.push_back(texture);
 }
 void TrainView::resetArcball()
@@ -208,6 +213,7 @@ void TrainView::paintGL()
 	DimensionTransformation(ModelViewMatrex, MV);
 	DimensionTransformation(ProjectionMatrex, P);
 	sky->paintSkybox(P, MV);
+	
 
 	setupFloor();
 	glDisable(GL_LIGHTING);
@@ -379,7 +385,7 @@ void TrainView::drawStuff(bool doingShadows)
 	//####################################################################
 
 	this->drawTrack(doingShadows);
-
+	mountain->render(P, MV);
 
 
 #ifdef EXAMPLE_SOLUTION
