@@ -30,7 +30,7 @@ void TrainView::initializeGL()
 	water->Init();
 
 	//Create Mountain object
-	mountain = new Mountain(100,100,Point3d(100,0,0), "./Textures/mountain_hieght_map.jfif","./Textures/mountain_rock.jfif");
+	mountain = new Mountain(100, 100, Point3d(100, 0, 0), "./Textures/mountain_hieght_map.jfif", "./Textures/mountain_rock.jfif");
 	mountain->Init();
 
 	//Create a skybox object
@@ -59,10 +59,15 @@ void TrainView::initializeGL()
 	/*spaceShipReflection = new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 20.f, 3.f), REFLECTION);
 	spaceShipRefraction = new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 20.f, 3.f), REFRACTION);*/
 
-	TrainItem item(0,0,true);
+	TrainItem item(0, 0, true);
 	item.train = new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 20.f, 3.f), TRAIN);
 	trainList.push_back(item);
 
+	planet = new Model("./Object/earth.obj", 50, Point3d(0, 0, 0));
+
+	//spaceTest = new Model*[2];
+	//for (int i = 0; i < 2; i++)
+		spaceTest = new Model("./Object/Kameriexplorerflying.obj", 20, Point3d(0, 0, 0));
 
 	//音樂
 	QMediaPlaylist* playlist = new QMediaPlaylist();
@@ -126,7 +131,7 @@ void TrainView::initializeTexture()
 {
 	//Load and create a texture for square;'stexture
 	QOpenGLTexture* texture = new QOpenGLTexture(QImage("./Textures/Tupi.bmp"));
-	
+
 	Textures.push_back(texture);
 }
 void TrainView::resetArcball()
@@ -225,7 +230,7 @@ void TrainView::paintGL()
 	DimensionTransformation(ModelViewMatrex, MV);
 	DimensionTransformation(ProjectionMatrex, P);
 	sky->paintSkybox(P, MV);
-	
+
 
 	setupFloor();
 	glDisable(GL_LIGHTING);
@@ -252,7 +257,7 @@ void TrainView::paintGL()
 		unsetupShadows();
 	}
 
-	
+
 
 	//we manage textures by Trainview class, so we modify square's render function
 	square->Begin();
@@ -416,6 +421,11 @@ void TrainView::drawStuff(bool doingShadows)
 	static Point3d rotation(0, 0, 0);
 	d > 360.f ? d = 0.f : d += 0.1;
 
+	static float movement = -5000;
+	static short cnt = 0;
+	movement > 5000.f ? movement = -5000.f : movement += 2.f;
+	if (movement == 5000.f)
+		cnt == 2 ? cnt = 0 : cnt++;
 	//Test model render
 	rotation.y = d;
 	/*for (int i = 0; i < 5; i++)
@@ -435,11 +445,146 @@ void TrainView::drawStuff(bool doingShadows)
 		spaceTest[i]->render(P, MV, false, false);
 	}*/
 
-	//Test shader
-	rotation.y = d - 90;
-	rotation.z = 0;
-	spaceShip->updateRotation(rotation, Point3d(r * cos(d *  PI / 180.0) / 10.f, 10.f, -r * sin(d * PI / 180.0) / 10.f));
-	spaceShip->render(P, MV, false, false);
+
+	//箭頭形艦隊render
+	switch (cnt)
+	{
+	case 0:
+		for (int j = 0; j < 3; j++)
+		{
+			for (int i = 0; i < 5; i++)
+			{
+				switch (i)
+				{
+				case 0:
+					spaceTest->updateRotation(Point3d(0, 0, 0), Point3d(i  * -300, 3000, -movement - (j * 500) + 1000));
+					break;
+				case 1:
+					spaceTest->updateRotation(Point3d(0, 0, 0), Point3d(i  * -300, 3000, -movement - (j * 500) + 500));
+					break;
+				case 2:
+					spaceTest->updateRotation(Point3d(0, 0, 0), Point3d(i  * -300, 3000, -movement - (j * 500)));
+					break;
+				case 3:
+					spaceTest->updateRotation(Point3d(0, 0, 0), Point3d(i  * -300, 3000, -movement - (j * 500) + 500));
+					break;
+				case 4:
+					spaceTest->updateRotation(Point3d(0, 0, 0), Point3d(i  * -300, 3000, -movement - (j * 500) + 1000));
+					break;
+				}
+
+				spaceTest->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
+				spaceTest->render(P, MV, false, false);
+			}
+		}
+		break;
+	case 1:
+		for (int j = 0; j < 3; j++)
+		{
+			for (int i = 0; i < 5; i++)
+			{
+				switch (i)
+				{
+				case 0:
+					spaceTest->updateRotation(Point3d(0, 90, 0), Point3d(-movement - (j * 500) + 1000, 2500, i  * -300));
+					break;
+				case 1:
+					spaceTest->updateRotation(Point3d(0, 90, 0), Point3d(-movement - (j * 500) + 500, 2500, i  * -300));
+					break;
+				case 2:
+					spaceTest->updateRotation(Point3d(0, 90, 0), Point3d(-movement - (j * 500), 2500, i  * -300));
+					break;
+				case 3:
+					spaceTest->updateRotation(Point3d(0, 90, 0), Point3d(-movement - (j * 500) + 500, 2500, i  * -300));
+					break;
+				case 4:
+					spaceTest->updateRotation(Point3d(0, 90, 0), Point3d(-movement - (j * 500) + 1000, 2500, i  * -300));
+					break;
+				}
+
+				spaceTest->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
+				spaceTest->render(P, MV, false, false);
+			}
+		}
+		break;
+		case 2:
+			for (int j = 0; j < 3; j++)
+			{
+				for (int i = 0; i < 5; i++)
+				{
+					switch (i)
+					{
+					case 0:
+						spaceTest->updateRotation(Point3d(90, 0, 0), Point3d(-3000, movement - (j * 500) - 1000, i  * -200));
+						break;
+					case 1:
+						spaceTest->updateRotation(Point3d(90, 0, 0), Point3d(-3000, movement - (j * 500) - 500, i  * -200));
+						break;
+					case 2:
+						spaceTest->updateRotation(Point3d(90, 0, 0), Point3d(-3000, movement - (j * 500), i  * -200));
+						break;
+					case 3:
+						spaceTest->updateRotation(Point3d(90, 0, 0), Point3d(-3000 ,movement - (j * 500) - 500, i  * -200));
+						break;
+					case 4:
+						spaceTest->updateRotation(Point3d(90, 0, 0), Point3d(-3000, movement - (j * 500) - 1000, i  * -200));
+						break;
+					}
+
+					spaceTest->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
+					spaceTest->render(P, MV, false, false);
+				}
+			}
+			break;
+	}
+
+	//艦隊隧道
+//for (int i = 10; i < 20; i++)
+//{
+//	if (i < 15)
+//		spaceTest->updateRotation(Point3d(0, 0, 0), Point3d((i - 10) * -200 + 1000, (i - 10) * 200, -movement - (j * 500)));
+//	else
+//		spaceTest->updateRotation(Point3d(0, 0, 0), Point3d((i - 15) * -200 + 1000, (i - 15) * -200, -movement - (j * 500)));
+
+//	spaceTest->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
+//	spaceTest->render(P, MV, false, false);
+//}
+//for (int i = 20; i < 30; i++)
+//{
+//	if (i < 25)
+//		spaceTest->updateRotation(Point3d(0, 0, 0), Point3d((i - 20) * +200 - 1000, (i - 20) * 200, -movement - (j * 500)));
+//	else
+//		spaceTest->updateRotation(Point3d(0, 0, 0), Point3d((i - 25) * +200 - 1000, (i - 25) * -200, -movement - (j * 500)));
+
+//	spaceTest->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
+//	spaceTest->render(P, MV, false, false);
+//}
+
+//for (int i = 10; i < 20; i++)
+//{
+//	if (i < 15)
+//		spaceTest->updateRotation(Point3d(0, 90, 0), Point3d(-movement - (j * 500) - 5000, (i - 10) * 200, (i - 10) * -200 + 1000));
+//	else
+//		spaceTest->updateRotation(Point3d(0, 90, 0), Point3d(-movement - (j * 500) - 5000, (i - 15) * -200, (i - 15) * -200 + 1000));
+
+//	spaceTest->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
+//	spaceTest->render(P, MV, false, false);
+//}
+//for (int i = 20; i < 30; i++)
+//{
+//	if (i < 25)
+//		spaceTest->updateRotation(Point3d(0, 90, 0), Point3d(-movement - (j * 500) - 5000, (i - 20) * 200, (i - 20) * +200 - 1000));
+//	else
+//		spaceTest->updateRotation(Point3d(0, 90, 0), Point3d(-movement - (j * 500) - 5000, (i - 25) * -200, (i - 25) * +200 - 1000));
+
+//	spaceTest->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
+//	spaceTest->render(P, MV, false, false);
+//}
+	////Test shader
+	//rotation.y = d - 90;
+	//rotation.z = 0;
+	//spaceShip->updateRotation(rotation, Point3d(r * cos(d *  PI / 180.0) / 10.f, 10.f, -r * sin(d * PI / 180.0) / 10.f));
+	//spaceShip->render(P, MV, false, false);
 	/*
 	rotation.z = 16.69929;
 	spaceShipReflection->updateRotation(rotation, Point3d(r * cos(d *  PI / 180.0) / 10.f, 20.f, -r * sin(d * PI / 180.0) / 10.f));
@@ -449,7 +594,7 @@ void TrainView::drawStuff(bool doingShadows)
 	spaceShipRefraction->updateRotation(rotation, Point3d(r * cos(d *  PI / 180.0) / 10.f, 30.f, -r * sin(d * PI / 180.0) / 10.f));
 	spaceShipRefraction->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
 	spaceShipRefraction->render(P, MV, false, false);*/
-	
+
 
 
 #ifdef EXAMPLE_SOLUTION
@@ -507,14 +652,14 @@ drawTrack(bool doingShadows)
 				glVertex3f(sample2.x - cross_t.x, sample2.y - cross_t.y, sample2.z - cross_t.z);
 				glEnd();
 				glLineWidth(1);
-				
+
 				float dist = distance(previous_sample, sample1);
 				if (dist > RAIL_WIDTH * 2)
 				{
 					Pnt3f tangentP = (sample1 - sample2);
 					tangentP.normalize();
 					tangentP = sample1 + tangentP * RAIL_WIDTH;
-					
+
 					glBegin(GL_POLYGON);
 					glVertex3f(sample1.x + cross_t.x, sample1.y + cross_t.y, sample1.z + cross_t.z);
 					glVertex3f(tangentP.x + cross_t.x, tangentP.y + cross_t.y, tangentP.z + cross_t.z);
@@ -556,9 +701,9 @@ drawTrack(bool doingShadows)
 void TrainView::
 drawTrain(float t)
 {
-	
 
-	
+
+
 	GLfloat MV[4][4];
 	GLfloat P[4][4];
 	DimensionTransformation(ModelViewMatrex, MV);

@@ -275,7 +275,7 @@ void Model::Init()
 		InitShader("./Shader/Model.vs", "./Shader/Model-refraction.fs", "./Shader/Model.gs");
 		break;
 	case TRAIN:
-		InitShader("./Shader/TrainModel.vs", "./Shader/Model.fs", "./Shader/Model.gs");
+		InitShader("./Shader/TrainModel.vs", "./Shader/TrainModel.fs", "./Shader/Model.gs");
 		break;
 	}
 	InitVAO();

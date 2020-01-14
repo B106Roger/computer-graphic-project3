@@ -5,11 +5,11 @@ layout (location = 0) out vec4 color;
 in vec3 vs_worldpos;
 in vec3 vs_normal;
 
-uniform vec4 color_ambient = vec4(0.1,0.2,0.5,1.0);
+uniform vec4 color_ambient = vec4(0.8,0.2,0.0,1.0);
 uniform vec4 color_diffuse = vec4(0.2,0.3,0.6,1.0);
 
 uniform vec4 color_specular = vec4(1.0,1.0,1.0,1.0);
-uniform vec4 Color = vec4(0.1,0.1,0.1,0.1);
+uniform vec4 Color = vec4(0.5,0.1,0.1,0.1);
 
 uniform float shininess = 77.0f;
 uniform vec3 light_position = vec3(50.0f,32.0f,560.0f);

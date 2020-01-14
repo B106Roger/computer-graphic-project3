@@ -135,8 +135,8 @@ public:
 	Skybox *sky;
 	Mountain * mountain;
 
-	Model **earth;
-	Model **spaceTest;
+	Model *planet;
+	Model *spaceTest;
 
 
 	// **********************************
