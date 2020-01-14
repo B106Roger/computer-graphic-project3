@@ -136,7 +136,7 @@ public:
 	Mountain * mountain;
 
 	Model *planet;
-	Model *spaceTest;
+	Model **spaceTest;
 
 
 	// **********************************

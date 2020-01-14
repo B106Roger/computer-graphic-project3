@@ -16,7 +16,7 @@
 using namespace std;
 
 
-enum ShaderType { NORMAL, REFLECTION, REFRACTION ,TRAIN };
+enum ShaderType { NORMAL, REFLECTION, REFRACTION ,TRAIN,PLANET,CHASER };
 
 class Model
 {

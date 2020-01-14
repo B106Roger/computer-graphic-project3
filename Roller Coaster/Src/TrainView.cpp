@@ -55,6 +55,7 @@ void TrainView::initializeGL()
 	curve = 0;          // 軌道類別
 	// 其他物件
 	isTire = false;
+
 	spaceShip = new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 10.f, 3.f));
 	/*spaceShipReflection = new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 20.f, 3.f), REFLECTION);
 	spaceShipRefraction = new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 20.f, 3.f), REFRACTION);*/
@@ -63,36 +64,17 @@ void TrainView::initializeGL()
 	item.train = new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 20.f, 3.f), TRAIN);
 	trainList.push_back(item);
 
-	planet = new Model("./Object/earth.obj", 50, Point3d(0, 0, 0));
 
-	//spaceTest = new Model*[2];
-	//for (int i = 0; i < 2; i++)
-		spaceTest = new Model("./Object/Kameriexplorerflying.obj", 20, Point3d(0, 0, 0));
+	//太空物件
+	planet = new Model("./Object/earth.obj", 50, Point3d(0, 0, 0), PLANET);
 
-	//音樂
-	QMediaPlaylist* playlist = new QMediaPlaylist();
-	playlist->addMedia(QUrl("./Music/StarWar.mp3"));
-	playlist->setPlaybackMode(QMediaPlaylist::Loop);
+	spaceTest = new Model*[2];
+	spaceTest[0] = new Model("./Object/Kameriexplorerflying.obj", 20, Point3d(0, 0, 0),NORMAL);
+	spaceTest[1] = new Model("./Object/Kameriexplorerflying.obj", 20, Point3d(0, 0, 0),CHASER);
 
-	DJ = new QMediaPlayer;
-	//player->setMedia(QUrl(QUrl::fromLocalFile("./Music/bgm.mp3")));
-	DJ->setPlaylist(playlist);
-	DJ->setVolume(50);
-	DJ->play();
 
-	//Model test
-	/*earth = new Model*[10];
-	spaceTest = new Model*[10];
-	for (int i = 0; i < 5; i++)
-	{
-		earth[i] = new Model("./Object/earth.obj", 50, Point3d(i * 1000, i * 1000, 0));
-		spaceTest[i] = new Model("./Object/Kameriexplorerflying.obj", 20, Point3d(i * 1000, i * 1000, 0));
-	}
-	for (int i = 6; i < 10; i++)
-	{
-		earth[i] = new Model("./Object/earth.obj", 50, Point3d((i - 5) * -1000, (i - 5) * 1000, 0));
-		spaceTest[i] = new Model("./Object/Kameriexplorerflying.obj", 20, Point3d((i - 5) * -1000, (i - 5) * 1000, 0));
-	}*/
+
+
 
 	// 初始化火車時間
 	t_time = 0.f;
@@ -417,33 +399,63 @@ void TrainView::drawStuff(bool doingShadows)
 	AppMain::getInstance()->advanceTrain();
 	this->drawTrain(t_time);
 
-	static float d = 0, r = 400;
+	static float degree = 0, r = 400;
 	static Point3d rotation(0, 0, 0);
-	d > 360.f ? d = 0.f : d += 0.1;
-
 	static float movement = -5000;
 	static short cnt = 0;
+
+	//飛船角度
+	degree > 360.f ? degree = 0.f : degree += 0.1;
+
+	//飛船移動
 	movement > 5000.f ? movement = -5000.f : movement += 2.f;
+
+	//更新隊形
 	if (movement == 5000.f)
 		cnt == 2 ? cnt = 0 : cnt++;
-	//Test model render
-	rotation.y = d;
-	/*for (int i = 0; i < 5; i++)
-	{
-		earth[i]->render(P, MV, false, false);
 
-		spaceTest[i]->updateRotation(rotation, Point3d(earth[i]->getPosition(0) + 20 + (r + 200) *15* cos(d *  PI / 180.0) / 10.f, i * 1000, -(r + 100) * 15* sin(d * PI / 180.0) / 10.f + 80.f));
-		spaceTest[i]->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
-		spaceTest[i]->render(P, MV, false, false);
+
+	rotation.y = degree;
+
+	//星球 & 護星艦
+	for (int i = 0; i < 8; i++)
+	{
+		switch (i)
+		{
+		case 0:
+			planet->updateRotation(Point3d(0, 0, 0), Point3d(2000, -2000, 0));
+
+			break;
+		case 1:
+			planet->updateRotation(Point3d(0, 0, 0), Point3d(-2000, -2000, 0));
+
+			break;
+		case 2:
+			planet->updateRotation(Point3d(0, 0, 0), Point3d(0, -2000, 2000));
+			break;
+		case 3:
+			planet->updateRotation(Point3d(0, 0, 0), Point3d(0, -2000, -2000));
+			break;
+		case 4:
+			planet->updateRotation(Point3d(0, 0, 0), Point3d(2000, 2000, 2000));
+			break;
+		case 5:
+			planet->updateRotation(Point3d(0, 0, 0), Point3d(-2000, 2000, 2000));
+			break;
+		case 6:
+			planet->updateRotation(Point3d(0, 0, 0), Point3d(2000, 2000, -2000));
+			break;
+		case 7:
+			planet->updateRotation(Point3d(0, 0, 0), Point3d(-2000, 2000, -2000));
+			break;
+		}
+
+		spaceTest[1]->updateRotation(rotation, Point3d(planet->getPosition(0) + 20 + (r + 200) * 15 * cos(degree *  PI / 180.0) / 10.f, planet->getPosition(1), planet->getPosition(2) - (r + 100) * 15 * sin(degree * PI / 180.0) / 10.f + 80.f));
+		planet->render(P, MV, false, false);
+		spaceTest[1]->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
+		spaceTest[1]->render(P, MV, false, false);
 	}
-	for (int i = 6; i < 10; i++)
-	{
-		earth[i]->render(P, MV, false, false);
 
-		spaceTest[i]->updateRotation(rotation, Point3d(earth[i]->getPosition(0) + (r + 100) * 15* cos(d *  PI / 180.0) / 10.f, (i - 5) * 1000, -(r + 100) * 15* sin(d * PI / 180.0) / 10.f - 80.f));
-		spaceTest[i]->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
-		spaceTest[i]->render(P, MV, false, false);
-	}*/
 
 
 	//箭頭形艦隊render
@@ -457,24 +469,24 @@ void TrainView::drawStuff(bool doingShadows)
 				switch (i)
 				{
 				case 0:
-					spaceTest->updateRotation(Point3d(0, 0, 0), Point3d(i  * -300, 3000, -movement - (j * 500) + 1000));
+					spaceTest[0]->updateRotation(Point3d(0, 0, 0), Point3d(i  * -300, 3000, -movement - (j * 500) + 1000));
 					break;
 				case 1:
-					spaceTest->updateRotation(Point3d(0, 0, 0), Point3d(i  * -300, 3000, -movement - (j * 500) + 500));
+					spaceTest[0]->updateRotation(Point3d(0, 0, 0), Point3d(i  * -300, 3000, -movement - (j * 500) + 500));
 					break;
 				case 2:
-					spaceTest->updateRotation(Point3d(0, 0, 0), Point3d(i  * -300, 3000, -movement - (j * 500)));
+					spaceTest[0]->updateRotation(Point3d(0, 0, 0), Point3d(i  * -300, 3000, -movement - (j * 500)));
 					break;
 				case 3:
-					spaceTest->updateRotation(Point3d(0, 0, 0), Point3d(i  * -300, 3000, -movement - (j * 500) + 500));
+					spaceTest[0]->updateRotation(Point3d(0, 0, 0), Point3d(i  * -300, 3000, -movement - (j * 500) + 500));
 					break;
 				case 4:
-					spaceTest->updateRotation(Point3d(0, 0, 0), Point3d(i  * -300, 3000, -movement - (j * 500) + 1000));
+					spaceTest[0]->updateRotation(Point3d(0, 0, 0), Point3d(i  * -300, 3000, -movement - (j * 500) + 1000));
 					break;
 				}
 
-				spaceTest->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
-				spaceTest->render(P, MV, false, false);
+				spaceTest[0]->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
+				spaceTest[0]->render(P, MV, false, false);
 			}
 		}
 		break;
@@ -486,115 +498,57 @@ void TrainView::drawStuff(bool doingShadows)
 				switch (i)
 				{
 				case 0:
-					spaceTest->updateRotation(Point3d(0, 90, 0), Point3d(-movement - (j * 500) + 1000, 2500, i  * -300));
+					spaceTest[0]->updateRotation(Point3d(0, 90, 0), Point3d(-movement - (j * 500) + 1000, 2500, i  * -300));
 					break;
 				case 1:
-					spaceTest->updateRotation(Point3d(0, 90, 0), Point3d(-movement - (j * 500) + 500, 2500, i  * -300));
+					spaceTest[0]->updateRotation(Point3d(0, 90, 0), Point3d(-movement - (j * 500) + 500, 2500, i  * -300));
 					break;
 				case 2:
-					spaceTest->updateRotation(Point3d(0, 90, 0), Point3d(-movement - (j * 500), 2500, i  * -300));
+					spaceTest[0]->updateRotation(Point3d(0, 90, 0), Point3d(-movement - (j * 500), 2500, i  * -300));
 					break;
 				case 3:
-					spaceTest->updateRotation(Point3d(0, 90, 0), Point3d(-movement - (j * 500) + 500, 2500, i  * -300));
+					spaceTest[0]->updateRotation(Point3d(0, 90, 0), Point3d(-movement - (j * 500) + 500, 2500, i  * -300));
 					break;
 				case 4:
-					spaceTest->updateRotation(Point3d(0, 90, 0), Point3d(-movement - (j * 500) + 1000, 2500, i  * -300));
+					spaceTest[0]->updateRotation(Point3d(0, 90, 0), Point3d(-movement - (j * 500) + 1000, 2500, i  * -300));
 					break;
 				}
 
-				spaceTest->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
-				spaceTest->render(P, MV, false, false);
+				spaceTest[0]->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
+				spaceTest[0]->render(P, MV, false, false);
 			}
 		}
 		break;
-		case 2:
-			for (int j = 0; j < 3; j++)
+	case 2:
+		for (int j = 0; j < 3; j++)
+		{
+			for (int i = 0; i < 5; i++)
 			{
-				for (int i = 0; i < 5; i++)
+				switch (i)
 				{
-					switch (i)
-					{
-					case 0:
-						spaceTest->updateRotation(Point3d(90, 0, 0), Point3d(-3000, movement - (j * 500) - 1000, i  * -200));
-						break;
-					case 1:
-						spaceTest->updateRotation(Point3d(90, 0, 0), Point3d(-3000, movement - (j * 500) - 500, i  * -200));
-						break;
-					case 2:
-						spaceTest->updateRotation(Point3d(90, 0, 0), Point3d(-3000, movement - (j * 500), i  * -200));
-						break;
-					case 3:
-						spaceTest->updateRotation(Point3d(90, 0, 0), Point3d(-3000 ,movement - (j * 500) - 500, i  * -200));
-						break;
-					case 4:
-						spaceTest->updateRotation(Point3d(90, 0, 0), Point3d(-3000, movement - (j * 500) - 1000, i  * -200));
-						break;
-					}
-
-					spaceTest->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
-					spaceTest->render(P, MV, false, false);
+				case 0:
+					spaceTest[0]->updateRotation(Point3d(90, 0, 0), Point3d(-3000, movement - (j * 500) - 1000, i  * -200));
+					break;
+				case 1:
+					spaceTest[0]->updateRotation(Point3d(90, 0, 0), Point3d(-3000, movement - (j * 500) - 500, i  * -200));
+					break;
+				case 2:
+					spaceTest[0]->updateRotation(Point3d(90, 0, 0), Point3d(-3000, movement - (j * 500), i  * -200));
+					break;
+				case 3:
+					spaceTest[0]->updateRotation(Point3d(90, 0, 0), Point3d(-3000, movement - (j * 500) - 500, i  * -200));
+					break;
+				case 4:
+					spaceTest[0]->updateRotation(Point3d(90, 0, 0), Point3d(-3000, movement - (j * 500) - 1000, i  * -200));
+					break;
 				}
+
+				spaceTest[0]->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
+				spaceTest[0]->render(P, MV, false, false);
 			}
-			break;
+		}
+		break;
 	}
-
-	//艦隊隧道
-//for (int i = 10; i < 20; i++)
-//{
-//	if (i < 15)
-//		spaceTest->updateRotation(Point3d(0, 0, 0), Point3d((i - 10) * -200 + 1000, (i - 10) * 200, -movement - (j * 500)));
-//	else
-//		spaceTest->updateRotation(Point3d(0, 0, 0), Point3d((i - 15) * -200 + 1000, (i - 15) * -200, -movement - (j * 500)));
-
-//	spaceTest->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
-//	spaceTest->render(P, MV, false, false);
-//}
-//for (int i = 20; i < 30; i++)
-//{
-//	if (i < 25)
-//		spaceTest->updateRotation(Point3d(0, 0, 0), Point3d((i - 20) * +200 - 1000, (i - 20) * 200, -movement - (j * 500)));
-//	else
-//		spaceTest->updateRotation(Point3d(0, 0, 0), Point3d((i - 25) * +200 - 1000, (i - 25) * -200, -movement - (j * 500)));
-
-//	spaceTest->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
-//	spaceTest->render(P, MV, false, false);
-//}
-
-//for (int i = 10; i < 20; i++)
-//{
-//	if (i < 15)
-//		spaceTest->updateRotation(Point3d(0, 90, 0), Point3d(-movement - (j * 500) - 5000, (i - 10) * 200, (i - 10) * -200 + 1000));
-//	else
-//		spaceTest->updateRotation(Point3d(0, 90, 0), Point3d(-movement - (j * 500) - 5000, (i - 15) * -200, (i - 15) * -200 + 1000));
-
-//	spaceTest->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
-//	spaceTest->render(P, MV, false, false);
-//}
-//for (int i = 20; i < 30; i++)
-//{
-//	if (i < 25)
-//		spaceTest->updateRotation(Point3d(0, 90, 0), Point3d(-movement - (j * 500) - 5000, (i - 20) * 200, (i - 20) * +200 - 1000));
-//	else
-//		spaceTest->updateRotation(Point3d(0, 90, 0), Point3d(-movement - (j * 500) - 5000, (i - 25) * -200, (i - 25) * +200 - 1000));
-
-//	spaceTest->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
-//	spaceTest->render(P, MV, false, false);
-//}
-	////Test shader
-	//rotation.y = d - 90;
-	//rotation.z = 0;
-	//spaceShip->updateRotation(rotation, Point3d(r * cos(d *  PI / 180.0) / 10.f, 10.f, -r * sin(d * PI / 180.0) / 10.f));
-	//spaceShip->render(P, MV, false, false);
-	/*
-	rotation.z = 16.69929;
-	spaceShipReflection->updateRotation(rotation, Point3d(r * cos(d *  PI / 180.0) / 10.f, 20.f, -r * sin(d * PI / 180.0) / 10.f));
-	spaceShipReflection->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
-	spaceShipReflection->render(P, MV, false, false);
-
-	spaceShipRefraction->updateRotation(rotation, Point3d(r * cos(d *  PI / 180.0) / 10.f, 30.f, -r * sin(d * PI / 180.0) / 10.f));
-	spaceShipRefraction->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
-	spaceShipRefraction->render(P, MV, false, false);*/
-
 
 
 #ifdef EXAMPLE_SOLUTION
@@ -793,12 +747,15 @@ doPick(int mx, int my)
 void TrainView::
 initializeMedia()
 {
-	QMediaPlayer *player;
-	player = new QMediaPlayer;
-	player->setMedia(QUrl(QUrl::fromLocalFile("D:\\GitHub\\Monopoly\\Monopoly\\music\\Maple Valley.wav")));
-	player->setVolume(50);
-	player->play();
+	//音樂
+	QMediaPlaylist* playlist = new QMediaPlaylist();
+	playlist->addMedia(QUrl("./Music/StarWar.mp3"));
+	playlist->setPlaybackMode(QMediaPlaylist::Loop);
 
+	DJ = new QMediaPlayer;
+	DJ->setPlaylist(playlist);
+	DJ->setVolume(50);
+	DJ->play();
 }
 
 void TrainView::

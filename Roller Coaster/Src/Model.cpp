@@ -277,6 +277,12 @@ void Model::Init()
 	case TRAIN:
 		InitShader("./Shader/TrainModel.vs", "./Shader/TrainModel.fs", "./Shader/Model.gs");
 		break;
+	case PLANET:
+		InitShader("./Shader/Model.vs", "./Shader/PlanetModel.fs", "./Shader/Model.gs");
+		break;
+	case CHASER:
+		InitShader("./Shader/Model.vs", "./Shader/ChaserModel.fs", "./Shader/Model.gs");
+		break;
 	}
 	InitVAO();
 	InitVBO();
