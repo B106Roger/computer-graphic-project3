@@ -1,3 +1,2 @@
-﻿  TrainView.cpp
-c:\users\brian\documents\github\computer-graphic-project3\roller coaster\include\model.h(57): warning C4715: 'Model::getPosition': 不是所有控制路徑都傳回值
-  Roller Coaster.vcxproj -> C:\Users\Brian\Documents\GitHub\computer-graphic-project3\x64\Debug\Roller Coaster.exe
+﻿  Tire.cpp
+  Roller Coaster.vcxproj -> D:\GitHub\computer-graphic-project3\x64\Debug\Roller Coaster.exe

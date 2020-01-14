@@ -28,6 +28,7 @@ void TrainView::initializeGL()
 	//Create a water object
 	water = new Water();
 	water->Init();
+	
 
 	//Create Mountain object
 	mountain = new Mountain(100, 100, Point3d(100, 0, 0), "./Textures/mountain_hieght_map.jfif", "./Textures/mountain_rock.jfif");
@@ -37,7 +38,7 @@ void TrainView::initializeGL()
 	sky = new Skybox();
 	sky->Init();
 	Model::skyboxShaderID = sky->skyboxTextureID;
-
+	tire = new Tire();
 
 	//Initialize texture 
 	initializeTexture();
@@ -666,32 +667,35 @@ drawTrain(float t)
 	int i = 0;
 	for (TrainItem item : trainList)
 	{
-		if (i == 0 && isTire)
-		{
-			i++;
-		}
+		int curveIndex = item.curveIndex;
+		int pointIndex = item.pointIndex;
+		Pnt3f _normal = this->m_pTrack->normalVectors[curveIndex][pointIndex];
+		Pnt3f _sample1 = this->m_pTrack->samplePoints[curveIndex][pointIndex];
+		Pnt3f _sample2;
+		if (pointIndex == (int)this->m_pTrack->samplePoints[curveIndex].size() - 1)
+			// 這裡有bug, 因為第一條曲線的最後一個點跟第二條曲線的第一個點一樣, 所以計算出的tangent=0,0,0
+			_sample2 = this->m_pTrack->samplePoints[(curveIndex + 1) % this->m_pTrack->samplePoints.size()][1];
 		else
+			_sample2 = this->m_pTrack->samplePoints[curveIndex][pointIndex + 1];
+
+		Point3d normal = Point3d(_normal.x, _normal.y, _normal.z);
+		Point3d sample1 = Point3d(_sample1.x, _sample1.y, _sample1.z);
+		Point3d sample2 = Point3d(_sample2.x, _sample2.y, _sample2.z);
+		Point3d tangent = sample2 - sample1;
+
+		if (isTire == false || i != 0)
 		{
-			int curveIndex = item.curveIndex;
-			int pointIndex = item.pointIndex;
-			Pnt3f _normal = this->m_pTrack->normalVectors[curveIndex][pointIndex];
-			Pnt3f _sample1 = this->m_pTrack->samplePoints[curveIndex][pointIndex];
-			Pnt3f _sample2;
-			if (pointIndex == (int)this->m_pTrack->samplePoints[curveIndex].size() - 1)
-				// 這裡有bug, 因為第一條曲線的最後一個點跟第二條曲線的第一個點一樣, 所以計算出的tangent=0,0,0
-				_sample2 = this->m_pTrack->samplePoints[(curveIndex + 1) % this->m_pTrack->samplePoints.size()][1];
-			else
-				_sample2 = this->m_pTrack->samplePoints[curveIndex][pointIndex + 1];
-
-			Point3d normal = Point3d(_normal.x, _normal.y, _normal.z);
-			Point3d sample1 = Point3d(_sample1.x, _sample1.y, _sample1.z);
-			Point3d sample2 = Point3d(_sample2.x, _sample2.y, _sample2.z);
-			Point3d tangent = sample2 - sample1;
-
-
 			item.train->setEyePosition(-arcball.eyeX, -arcball.eyeY, -arcball.eyeZ);
 			item.train->updateRotation(sample1, tangent, normal);
 			item.train->render(P, MV);
+		}
+		else
+		{
+			tire->setEyePosition(-arcball.eyeX, -arcball.eyeY, -arcball.eyeZ);
+			tire->updateRotation(sample1, tangent, normal);
+			tire->render(P, MV);
+
+			i++;
 		}
 	}
 }

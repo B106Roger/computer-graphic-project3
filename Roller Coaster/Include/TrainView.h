@@ -16,7 +16,7 @@
 #include "Water.h"
 #include "Skybox.h"
 #include "Mountain.h"
-
+#include "Tire.h"
 
 
 class AppMain;
@@ -114,6 +114,7 @@ public:
 
 	Triangle* triangle;
 	Water *water;
+	Tire *tire;
 	Square* square;
 	GLfloat ProjectionMatrex[16];
 	GLfloat ModelViewMatrex[16];

@@ -592,6 +592,11 @@ advanceTrain(float dir)
 					item.curveIndex = newCurveIndex;
 					item.pointIndex = newPointIndex;
 				}
+
+				float deltaAngle = 360.f * this->trainview->speed / 30.f / (6.28318*this->trainview->tire->radius);
+				this->trainview->tire->angle -= deltaAngle;
+				if (this->trainview->tire->angle < 0.f)
+					this->trainview->tire->angle += 360.f;
 			}
 		}
 	}

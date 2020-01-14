@@ -190,6 +190,7 @@
     <ClCompile Include="Src\Model.cpp" />
     <ClCompile Include="Src\Mountain.cpp" />
     <ClCompile Include="Src\Square.cpp" />
+    <ClCompile Include="Src\Tire.cpp" />
     <ClCompile Include="Src\Track.cpp" />
     <ClCompile Include="Src\TrainView.cpp" />
     <ClCompile Include="Src\Triangle.cpp" />
@@ -210,6 +211,7 @@
     <ClInclude Include="Include\Mountain.h" />
     <ClInclude Include="Include\point3d.h" />
     <ClInclude Include="Include\Square.h" />
+    <ClInclude Include="Include\Tire.h" />
     <ClInclude Include="Include\Track.H" />
     <ClInclude Include="Include\vector.h" />
     <ClInclude Include="Include\Water.h" />

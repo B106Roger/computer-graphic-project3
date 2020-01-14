@@ -40,6 +40,11 @@ struct Point3d
 		return Point3d(*this) *= f;
 	}
 
+	Point3d operator/(float f) const
+	{
+		return Point3d(x / f, y / f, z / f);
+	}
+
 	Point3d m(const float sX,const float sY, const float sZ)
 	{
 		float temp_x = x * (cos(sY* PI / 180.0)*cos(sZ* PI / 180.0) - sin(sX* PI / 180.0)*sin(sY* PI / 180.0)*sin(sZ* PI / 180.0)) + y * (-cos(sX* PI / 180.0)*sin(sZ* PI / 180.0)) + z * (sin(sY* PI / 180.0)*cos(sZ* PI / 180.0) + sin(sX* PI / 180.0)*cos(sY* PI / 180.0)*sin(sZ* PI / 180.0));
