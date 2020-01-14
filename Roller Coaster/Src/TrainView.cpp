@@ -515,8 +515,25 @@ drawTrack(bool doingShadows)
 				}
 				break;
 			}
-			
-			case 3:
+			case 2:
+			{
+				Pnt3f tangent = sample2 - sample1;
+				Pnt3f cross_t = tangent * normal;
+				cross_t.normalize();
+				cross_t = cross_t * 2.5f;
+
+				// 畫兩側鐵軌
+				glLineWidth(3);
+				glBegin(GL_LINES);
+				glVertex3f(sample1.x + cross_t.x, sample1.y + cross_t.y, sample1.z + cross_t.z);
+				glVertex3f(sample2.x + cross_t.x, sample2.y + cross_t.y, sample2.z + cross_t.z);
+
+				glVertex3f(sample1.x - cross_t.x, sample1.y - cross_t.y, sample1.z - cross_t.z);
+				glVertex3f(sample2.x - cross_t.x, sample2.y - cross_t.y, sample2.z - cross_t.z);
+				glEnd();
+				glLineWidth(1);
+				break;
+			}
 			default:
 				break;
 			}

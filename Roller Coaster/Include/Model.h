@@ -67,7 +67,7 @@ private:
 	Point3d position;
 	Point3d rotation;
 
-	GLfloat rotMatrix[4][4];
+	GLfloat rotMatrix[3][3];
 	QVector<Point3d> m_points;
 	QVector<Point3d> m_target_normals;
 	QVector<unsigned int> m_edgeIndices;

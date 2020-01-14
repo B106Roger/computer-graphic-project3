@@ -6,6 +6,7 @@ uniform float scale;
 uniform vec3 inputPos;
 uniform vec3 inputRot;
 uniform vec3 inputConst;
+uniform mat3 myMatrix;
 
 
 layout(location = 0) in vec3 position;
@@ -14,11 +15,10 @@ vec3 rotationTransfer(float x, float y, float z,float sX,float sY,float sZ);
 
 void main(void)
 {	
-	vec3 newpos = rotationTransfer(position.x, position.y, position.z,
-									inputRot.x, inputRot.y, inputRot.z);
+	mat3 inverse_matrix = inverse(myMatrix);
+	vec3 newpos = inverse_matrix * position;
 	newpos = (newpos + inputPos - inputConst); // * scale 
     gl_Position = proj_matrix * model_matrix * vec4(newpos, 1.0);
-	// normals = normal;
 }
 
 vec3 rotationTransfer(float x, float y, float z,float sX,float sY,float sZ)

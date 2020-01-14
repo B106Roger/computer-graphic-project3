@@ -293,7 +293,7 @@ computeSamplePoint()
 
 			float percent = 1.0f / (DIVIDE_LINE);
 			float t = 0;
-			Pnt3f qt, qt0, qt1, qt2, orient_t, cross_t, previous_qt;
+			Pnt3f qt, qt0, orient_t1, orient_t2, tangent, normal;
 
 			vector<vector<float>>
 				T =
@@ -308,7 +308,7 @@ computeSamplePoint()
 			qt = Pnt3f(qt_v[0][0], qt_v[1][0], qt_v[2][0]);
 
 
-			previous_qt = qt;
+			previousPoint = qt;
 			for (size_t j = 0; j < DIVIDE_LINE; j++)
 			{
 				// 處理軌道線條
@@ -322,11 +322,14 @@ computeSamplePoint()
 				qt0 = Pnt3f(qt_v[0][0], qt_v[1][0], qt_v[2][0]);
 
 				vector<vector<float>> orient_v = Multiply(G_orient, Multiply(M, T));
-				orient_t = Pnt3f(orient_v[0][0], orient_v[1][0], orient_v[2][0]);
-
+				orient_t1 = Pnt3f(orient_v[0][0], orient_v[1][0], orient_v[2][0]);
+				tangent = qt0 - previousPoint;
+				orient_t2 = orient_t1 * tangent;
+				normal = tangent * orient_t2;
+				normal.normalize();
 
 				samplePoints[i][j] = (qt0);
-				normalVectors[i][j] = (orient_t);
+				normalVectors[i][j] = (normal);
 
 				t += percent;
 			}

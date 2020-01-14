@@ -5,8 +5,6 @@ layout(triangles) in;
 // 聲明output primitive類型，output頂點數量多於max_vertices會被忽略
 layout(triangle_strip, max_vertices=9) out;
 
-// in vec3 normals[];
-
 out vec3 vs_worldpos;
 out vec3 vs_normal;
 

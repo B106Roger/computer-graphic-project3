@@ -235,6 +235,7 @@ void AppMain::LoadTrackPath()
 	{
 		this->m_Track.readPoints(fname);
 	}
+	this->trainview->m_pTrack->dirty = true;
 }
 
 void AppMain::SaveTrackPath()
