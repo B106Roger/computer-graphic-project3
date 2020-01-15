@@ -38,6 +38,7 @@ void TrainView::initializeGL()
 	sky = new Skybox();
 	sky->Init();
 	Model::skyboxShaderID = sky->skyboxTextureID;
+	water->skyboxTexture = sky->skyboxTextureID;
 	tire = new Tire();
 	ring = new StarRing("./Object/rock.obj", 20, Point3d(0, 0, 0));
 	mainPlanet = new Model("./Object/earth.obj", 800, Point3d(0, -350, 0), PLANET);
@@ -218,7 +219,8 @@ void TrainView::paintGL()
 
 	setupFloor();
 	glDisable(GL_LIGHTING);
-	// water->Paint(P, MV);
+	water->eyepos = QVector3D(this->arcball.eyeX, this->arcball.eyeY, this->arcball.eyeZ);
+	water->Paint(P, MV);
 	// drawFloor(200, 10);
 
 	// Call triangle's render function, pass ModelViewMatrex and ProjectionMatrex
@@ -389,7 +391,7 @@ void TrainView::drawStuff(bool doingShadows)
 	mountain->render(P, MV);
 
 	mainPlanet->render(P, MV);
-
+	
 #ifdef EXAMPLE_SOLUTION
 	drawTrack(this, doingShadows);
 #endif

@@ -8,7 +8,8 @@ layout(triangle_strip, max_vertices=6) out;
 out vec3 vs_worldpos;
 out vec3 vs_normal;
 
-
+in vec2 textureCoorVs[];
+out vec2 textureCoorGs;
 
 void main( void )
 {
@@ -21,6 +22,7 @@ void main( void )
         gl_Position = gl_in[i].gl_Position;
         vs_normal = N;
 		vs_worldpos = gl_in[i].gl_Position.xyz;
+		textureCoorGs = textureCoorVs[i];
         EmitVertex( );
     }
 

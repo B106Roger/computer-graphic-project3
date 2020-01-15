@@ -8,6 +8,7 @@
 #include <QFileInfo>
 #include <QDebug>
 #include <QString>
+#include "TGATexture.h"
 
 
 class Water 
@@ -22,9 +23,11 @@ public:
 	QOpenGLVertexArrayObject vao;
 	QOpenGLBuffer vvbo;
 	QOpenGLBuffer cvbo;
-
+	GLuint skyboxTexture;
 	float size;
 	int numberOfSquare;
+	GLuint texture;
+	QVector3D eyepos;
 
 public:
 	Water();

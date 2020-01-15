@@ -22,6 +22,8 @@ void Water::Paint(GLfloat P[][4], GLfloat MV[][4])
 	shaderProgram->setUniformValue("model_matrix",MV);
 	//pass time to shader
 	shaderProgram->setUniformValue("time", t);
+	shaderProgram->setUniformValue("cameraPos", eyepos);
+
 
 	// Bind the buffer so that it is the current active buffer.
 	vvbo.bind();
@@ -34,6 +36,8 @@ void Water::Paint(GLfloat P[][4], GLfloat MV[][4])
 	vvbo.release();
 
 	//Draw a triangle with 3 indices starting from the 0th index
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
 	glDrawArrays(GL_TRIANGLES,0,vertices.size());
 	//Disable Attribute 0&1
 	shaderProgram->disableAttributeArray(0);
@@ -50,6 +54,21 @@ void Water::Init()
 	InitShader("./Shader/Water.vs","./Shader/Water.fs", "./Shader/Water.gs");
 	InitVAO();
 	InitVBO();
+
+	int width, height;
+	void *pixels = read_tga("./Textures/water-texture-2.tga", &width, &height);
+
+	if (!pixels)
+		return ;
+
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, pixels);
+	free(pixels);
 }
 void Water::InitVAO()
 {
