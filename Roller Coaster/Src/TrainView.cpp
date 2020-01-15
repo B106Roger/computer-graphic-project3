@@ -31,7 +31,7 @@ void TrainView::initializeGL()
 	
 
 	//Create Mountain object
-	mountain = new Mountain(100, 100, Point3d(100, 0, 0), "./Textures/mountain_hieght_map.jfif", "./Textures/mountain_rock.jfif");
+	mountain = new Mountain(100, 100, Point3d(0, 0, 0), "./Textures/mountain_hieght_map.jfif", "./Textures/mountain_rock.jfif");
 	mountain->Init();
 
 	//Create a skybox object
@@ -39,7 +39,8 @@ void TrainView::initializeGL()
 	sky->Init();
 	Model::skyboxShaderID = sky->skyboxTextureID;
 	tire = new Tire();
-
+	ring = new StarRing("./Object/rock.obj", 20, Point3d(0, 0, 0));
+	mainPlanet = new Model("./Object/earth.obj", 800, Point3d(0, -350, 0), PLANET);
 	//Initialize texture 
 	initializeTexture();
 	//Initialize music
@@ -253,7 +254,7 @@ void TrainView::paintGL()
 	//Call square's render function, pass ModelViewMatrex and ProjectionMatrex
 	square->Paint(ProjectionMatrex, ModelViewMatrex);
 	square->End();
-
+	
 	// Particle 特效
 	// this->ProcessParticles();
 	this->DrawParticles();
@@ -387,6 +388,7 @@ void TrainView::drawStuff(bool doingShadows)
 	this->drawTrack(doingShadows);
 	mountain->render(P, MV);
 
+	mainPlanet->render(P, MV);
 
 #ifdef EXAMPLE_SOLUTION
 	drawTrack(this, doingShadows);
@@ -453,6 +455,8 @@ void TrainView::drawStuff(bool doingShadows)
 
 		spaceTest[1]->updateRotation(rotation, Point3d(planet->getPosition(0) + 20 + (r + 200) * 15 * cos(degree *  PI / 180.0) / 10.f, planet->getPosition(1), planet->getPosition(2) - (r + 100) * 15 * sin(degree * PI / 180.0) / 10.f + 80.f));
 		planet->render(P, MV, false, false);
+		ring->centerPoistion = QVector3D(0,30,0);
+		ring->render(P, MV);
 		spaceTest[1]->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
 		spaceTest[1]->render(P, MV, false, false);
 	}

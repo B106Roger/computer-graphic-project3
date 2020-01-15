@@ -17,6 +17,7 @@
 #include "Skybox.h"
 #include "Mountain.h"
 #include "Tire.h"
+#include "StarRing.h"
 
 
 class AppMain;
@@ -117,6 +118,7 @@ public:
 	Water *water;
 	Tire *tire;
 	Square* square;
+
 	GLfloat ProjectionMatrex[16];
 	GLfloat ModelViewMatrex[16];
 	QVector<QOpenGLTexture*> Textures;
@@ -134,9 +136,11 @@ public:
 	Model *spaceShip;
 	Model *spaceShipReflection;
 	Model *spaceShipRefraction;
+	Model *mainPlanet;
 	Skybox *sky;
 	Mountain * mountain;
-
+	StarRing *ring;
+	Model *rock;
 	Model *planet;
 	Model **spaceTest;
 

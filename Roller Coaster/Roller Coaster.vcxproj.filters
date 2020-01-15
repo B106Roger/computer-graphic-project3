@@ -91,9 +91,6 @@
     <ClCompile Include="Src\vector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TGATexture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Water.cpp">
       <Filter>Source Files\Object</Filter>
     </ClCompile>
@@ -106,9 +103,6 @@
     <ClCompile Include="Src\Model.cpp">
       <Filter>Source Files\Object</Filter>
     </ClCompile>
-    <ClCompile Include="Skybox.cpp">
-      <Filter>Source Files\Object</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Mountain.cpp">
       <Filter>Source Files\Object</Filter>
     </ClCompile>
@@ -117,6 +111,15 @@
     </ClCompile>
     <ClCompile Include="Src\Tire.cpp">
       <Filter>Source Files\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\StarRing.cpp">
+      <Filter>Source Files\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Skybox.cpp">
+      <Filter>Source Files\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\TGATexture.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -161,9 +164,6 @@
     <ClInclude Include="Include\vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TGATexture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Include\Water.h">
       <Filter>Header Files\Object</Filter>
     </ClInclude>
@@ -174,9 +174,6 @@
       <Filter>Header Files\Object</Filter>
     </ClInclude>
     <ClInclude Include="Include\Square.h">
-      <Filter>Header Files\Object</Filter>
-    </ClInclude>
-    <ClInclude Include="Skybox.h">
       <Filter>Header Files\Object</Filter>
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_AppMain.h">
@@ -190,6 +187,15 @@
     </ClInclude>
     <ClInclude Include="Include\Tire.h">
       <Filter>Header Files\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\StarRing.h">
+      <Filter>Header Files\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Skybox.h">
+      <Filter>Header Files\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\TGATexture.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
