@@ -1,23 +1,41 @@
-c:\users\brian\documents\github\computer-graphic-project3\roller coaster\x64\debug\3dsloader.obj
-c:\users\brian\documents\github\computer-graphic-project3\roller coaster\x64\debug\3dutils.obj
-c:\users\brian\documents\github\computer-graphic-project3\roller coaster\x64\debug\appmain.obj
-c:\users\brian\documents\github\computer-graphic-project3\roller coaster\x64\debug\arcballcam.obj
-c:\users\brian\documents\github\computer-graphic-project3\roller coaster\x64\debug\cbmploader.obj
-c:\users\brian\documents\github\computer-graphic-project3\roller coaster\x64\debug\controlpoint.obj
-c:\users\brian\documents\github\computer-graphic-project3\roller coaster\x64\debug\main.obj
-c:\users\brian\documents\github\computer-graphic-project3\roller coaster\x64\debug\moc_appmain.obj
-c:\users\brian\documents\github\computer-graphic-project3\roller coaster\x64\debug\moc_trainview.obj
-c:\users\brian\documents\github\computer-graphic-project3\roller coaster\x64\debug\model.obj
-c:\users\brian\documents\github\computer-graphic-project3\roller coaster\x64\debug\pnt3f.obj
-c:\users\brian\documents\github\computer-graphic-project3\roller coaster\x64\debug\qrc_appmain.obj
-c:\users\brian\documents\github\computer-graphic-project3\roller coaster\x64\debug\skybox.obj
-c:\users\brian\documents\github\computer-graphic-project3\roller coaster\x64\debug\square.obj
-c:\users\brian\documents\github\computer-graphic-project3\roller coaster\x64\debug\tgatexture.obj
-c:\users\brian\documents\github\computer-graphic-project3\roller coaster\x64\debug\track.obj
-c:\users\brian\documents\github\computer-graphic-project3\roller coaster\x64\debug\trainview.obj
-c:\users\brian\documents\github\computer-graphic-project3\roller coaster\x64\debug\triangle.obj
-c:\users\brian\documents\github\computer-graphic-project3\roller coaster\x64\debug\vector.obj
-c:\users\brian\documents\github\computer-graphic-project3\roller coaster\x64\debug\water.obj
-c:\users\brian\documents\github\computer-graphic-project3\x64\debug\roller coaster.pdb
-c:\users\brian\documents\github\computer-graphic-project3\x64\debug\roller coaster.exe
-c:\users\brian\documents\github\computer-graphic-project3\x64\debug\roller coaster.ilk
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\vc141.pdb
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\arcballcam.obj
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\3dutils.obj
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\triangle.obj
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\trainview.obj
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\track.obj
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\tire.obj
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\tgatexture.obj
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\starring.obj
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\square.obj
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\skybox.obj
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\mountain.obj
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\model.obj
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\main.obj
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\gerstnerwater.obj
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\controlpoint.obj
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\cbmploader.obj
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\appmain.obj
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\3dsloader.obj
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\moc_trainview.obj
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\moc_appmain.obj
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\water.obj
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\vector.obj
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\pnt3f.obj
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\qrc_appmain.obj
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\generatedfiles\debug\moc_appmain.cpp
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\generatedfiles\qrc_appmain.cpp
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\generatedfiles\ui_appmain.h
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\generatedfiles\debug\moc_trainview.cpp
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\x64\debug\roller coaster.exe
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\x64\debug\roller coaster.ilk
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\x64\debug\roller coaster.pdb
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\roller coaster.tlog\cl.command.1.tlog
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\roller coaster.tlog\cl.read.1.tlog
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\roller coaster.tlog\cl.write.1.tlog
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\roller coaster.tlog\custombuild.command.1.tlog
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\roller coaster.tlog\custombuild.read.1.tlog
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\roller coaster.tlog\custombuild.write.1.tlog
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\roller coaster.tlog\link.command.1.tlog
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\roller coaster.tlog\link.read.1.tlog
+c:\users\admin\desktop\圖學project3\computer-graphic-project3\roller coaster\x64\debug\roller coaster.tlog\link.write.1.tlog

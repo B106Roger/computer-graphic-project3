@@ -8,7 +8,7 @@ layout(location = 0) in vec2 position;
 out vec2 textureCoorVs;
 void main(void)
 {
-	vec3 displacement = vec3(-100,0,0);
+	vec3 displacement = vec3(50,5,30);
 	textureCoorVs = position.xy + vec2(100,100);
 	textureCoorVs = textureCoorVs / 200;
 	float wave = 3.f;

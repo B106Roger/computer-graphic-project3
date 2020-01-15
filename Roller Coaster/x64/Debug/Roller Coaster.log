@@ -1,9 +1,2 @@
-﻿  moc_AppMain.cpp
-  moc_TrainView.cpp
-  AppMain.cpp
-  TrainView.cpp
-  Water.cpp
-  main.cpp
-  正在產生程式碼...
-d:\github\computer-graphic-project3\roller coaster\include\model.h(57): warning C4715: 'Model::getPosition': 不是所有控制路徑都傳回值
-  Roller Coaster.vcxproj -> D:\GitHub\computer-graphic-project3\x64\Debug\Roller Coaster.exe
+﻿  StarRing.cpp
+  Roller Coaster.vcxproj -> C:\Users\admin\Desktop\圖學PROJECT3\computer-graphic-project3\x64\Debug\Roller Coaster.exe

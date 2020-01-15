@@ -28,10 +28,10 @@ void TrainView::initializeGL()
 	//Create a water object
 	water = new Water();
 	water->Init();
-	
+
 
 	//Create Mountain object
-	mountain = new Mountain(100, 100, Point3d(0, 0, 0), "./Textures/mountain_hieght_map.jfif", "./Textures/mountain_rock.jfif");
+	mountain = new Mountain(100, 100, Point3d(50, 0, 30), "./Textures/mountain_hieght_map.jfif", "./Textures/mountain_rock.jfif");
 	mountain->Init();
 
 	//Create a skybox object
@@ -71,11 +71,13 @@ void TrainView::initializeGL()
 	//太空物件
 	planet = new Model("./Object/earth.obj", 50, Point3d(0, 0, 0), PLANET);
 
-	spaceTest = new Model*[2];
-	spaceTest[0] = new Model("./Object/Kameriexplorerflying.obj", 20, Point3d(0, 0, 0),NORMAL);
-	spaceTest[1] = new Model("./Object/Kameriexplorerflying.obj", 20, Point3d(0, 0, 0),CHASER);
+	spaceTest = new Model*[4];
+	spaceTest[0] = new Model("./Object/Kameriexplorerflying.obj", 20, Point3d(0, 0, 0), NORMAL);
+	spaceTest[1] = new Model("./Object/Kameriexplorerflying.obj", 20, Point3d(0, 0, 0), CHASER);
+	spaceTest[2] = new Model("./Object/Kameriexplorerflying.obj", 20, Point3d(0, 0, 0), REFLECTION);
+	spaceTest[3] = new Model("./Object/Kameriexplorerflying.obj", 20, Point3d(0, 0, 0), REFRACTION);
 
-
+	Human = new Model("./Objct/FinalBaseMesh.obj", 10, Point3d(0, 0, 0), NORMAL);
 
 
 
@@ -256,9 +258,9 @@ void TrainView::paintGL()
 	//Call square's render function, pass ModelViewMatrex and ProjectionMatrex
 	square->Paint(ProjectionMatrex, ModelViewMatrex);
 	square->End();
-	
+
 	// Particle 特效
-	// this->ProcessParticles();
+	this->ProcessParticles();
 	this->DrawParticles();
 
 
@@ -391,7 +393,7 @@ void TrainView::drawStuff(bool doingShadows)
 	mountain->render(P, MV);
 
 	mainPlanet->render(P, MV);
-	
+
 #ifdef EXAMPLE_SOLUTION
 	drawTrack(this, doingShadows);
 #endif
@@ -413,7 +415,7 @@ void TrainView::drawStuff(bool doingShadows)
 	degree > 360.f ? degree = 0.f : degree += 0.1;
 
 	//飛船移動
-	movement > 5000.f ? movement = -5000.f : movement += 2.f;
+	movement > 5000.f ? movement = -5000.f : movement += 10.f;
 
 	//更新隊形
 	if (movement == 5000.f)
@@ -428,18 +430,18 @@ void TrainView::drawStuff(bool doingShadows)
 		switch (i)
 		{
 		case 0:
-			planet->updateRotation(Point3d(0, 0, 0), Point3d(2000, -2000, 0));
+			planet->updateRotation(Point3d(0, 0, 0), Point3d(4000, 1000, 0));
 
 			break;
 		case 1:
-			planet->updateRotation(Point3d(0, 0, 0), Point3d(-2000, -2000, 0));
+			planet->updateRotation(Point3d(0, 0, 0), Point3d(-4000, 1000, 0));
 
 			break;
 		case 2:
-			planet->updateRotation(Point3d(0, 0, 0), Point3d(0, -2000, 2000));
+			planet->updateRotation(Point3d(0, 0, 0), Point3d(0, 1000, 4000));
 			break;
 		case 3:
-			planet->updateRotation(Point3d(0, 0, 0), Point3d(0, -2000, -2000));
+			planet->updateRotation(Point3d(0, 0, 0), Point3d(0, 1000, -4000));
 			break;
 		case 4:
 			planet->updateRotation(Point3d(0, 0, 0), Point3d(2000, 2000, 2000));
@@ -456,9 +458,15 @@ void TrainView::drawStuff(bool doingShadows)
 		}
 
 		spaceTest[1]->updateRotation(rotation, Point3d(planet->getPosition(0) + 20 + (r + 200) * 15 * cos(degree *  PI / 180.0) / 10.f, planet->getPosition(1), planet->getPosition(2) - (r + 100) * 15 * sin(degree * PI / 180.0) / 10.f + 80.f));
+		spaceTest[2]->updateRotation(rotation, Point3d(planet->getPosition(0), planet->getPosition(1) + 500, planet->getPosition(2)));
+		spaceTest[3]->updateRotation(rotation, Point3d(planet->getPosition(0), planet->getPosition(1) - 500, planet->getPosition(2)));
 		planet->render(P, MV, false, false);
 		spaceTest[1]->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
 		spaceTest[1]->render(P, MV, false, false);
+		spaceTest[3]->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
+		spaceTest[3]->render(P, MV, false, false);
+		spaceTest[2]->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
+		spaceTest[2]->render(P, MV, false, false);
 	}
 	ring->centerPoistion = QVector3D(0, 50, 0);
 	ring->render(P, MV);
@@ -708,31 +716,102 @@ void TrainView::
 drawTurrnel()
 {
 	glBegin(GL_QUADS);
-
-	glColor3ub(0, 255, 0);
+	//
+	glColor3ub(160, 32, 240);
 	glVertex3f(-25, 15, 55);
 	glVertex3f(-40, 15, 55);
 	glVertex3f(-40, 0, 55);
 	glVertex3f(-25, 0, 55);
 
-	glColor3ub(0, 0, 255);
+	glColor3ub(160, 32, 240);
 	glVertex3f(-40, 15, 35);
 	glVertex3f(-25, 15, 35);
 	glVertex3f(-25, 0, 35);
 	glVertex3f(-40, 0, 35);
 
-	glColor3ub(255, 0, 0);
+	glColor3ub(160, 32, 240);
 	glVertex3f(-40, 15, 35);
 	glVertex3f(-25, 15, 35);
 	glVertex3f(-25, 15, 55);
 	glVertex3f(-40, 15, 55);
 
-	glColor3ub(155, 155, 155);
+	glColor3ub(160, 32, 240);
 	glVertex3f(-40, 0, 35);
 	glVertex3f(-25, 0, 35);
 	glVertex3f(-25, 0, 55);
 	glVertex3f(-40, 0, 55);
+	//
+	glColor3ub(138, 43, 226);
+	glVertex3f(-40, 15, 55);
+	glVertex3f(-55, 15, 55);
+	glVertex3f(-55, 0, 55);
+	glVertex3f(-40, 0, 55);
 
+	glColor3ub(138, 43, 226);
+	glVertex3f(-55, 15, 35);
+	glVertex3f(-40, 15, 35);
+	glVertex3f(-40, 0, 35);
+	glVertex3f(-55, 0, 35);
+
+	glColor3ub(138, 43, 226);
+	glVertex3f(-55, 15, 35);
+	glVertex3f(-40, 15, 35);
+	glVertex3f(-40, 15, 55);
+	glVertex3f(-55, 15, 55);
+
+	glColor3ub(138, 43, 226);
+	glVertex3f(-55, 0, 35);
+	glVertex3f(-40, 0, 35);
+	glVertex3f(-40, 0, 55);
+	glVertex3f(-55, 0, 55);
+	//
+	glColor3ub(160, 102, 211);
+	glVertex3f(-55, 15, 55);
+	glVertex3f(-70, 15, 55);
+	glVertex3f(-70, 0, 55);
+	glVertex3f(-55, 0, 55);
+
+	glColor3ub(160, 102, 211);
+	glVertex3f(-70, 15, 35);
+	glVertex3f(-55, 15, 35);
+	glVertex3f(-55, 0, 35);
+	glVertex3f(-70, 0, 35);
+
+	glColor3ub(160, 102, 211);
+	glVertex3f(-70, 15, 35);
+	glVertex3f(-55, 15, 35);
+	glVertex3f(-55, 15, 55);
+	glVertex3f(-70, 15, 55);
+
+	glColor3ub(160, 102, 211);
+	glVertex3f(-70, 0, 35);
+	glVertex3f(-55, 0, 35);
+	glVertex3f(-55, 0, 55);
+	glVertex3f(-70, 0, 55);
+	//
+	glColor3ub(153, 51, 250);
+	glVertex3f(-70, 15, 55);
+	glVertex3f(-85, 15, 55);
+	glVertex3f(-85, 0, 55);
+	glVertex3f(-70, 0, 55);
+
+	glColor3ub(153, 51, 250);
+	glVertex3f(-85, 15, 35);
+	glVertex3f(-70, 15, 35);
+	glVertex3f(-70, 0, 35);
+	glVertex3f(-85, 0, 35);
+
+	glColor3ub(153, 51, 250);
+	glVertex3f(-85, 15, 35);
+	glVertex3f(-70, 15, 35);
+	glVertex3f(-70, 15, 55);
+	glVertex3f(-85, 15, 55);
+
+	glColor3ub(153, 51, 250);
+	glVertex3f(-85, 0, 35);
+	glVertex3f(-70, 0, 35);
+	glVertex3f(-70, 0, 55);
+	glVertex3f(-85, 0, 55);
 	glEnd();
 }
 

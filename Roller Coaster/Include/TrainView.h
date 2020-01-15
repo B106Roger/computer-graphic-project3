@@ -143,6 +143,7 @@ public:
 	Model *rock;
 	Model *planet;
 	Model **spaceTest;
+	Model *Human;
 
 
 	// **********************************

@@ -241,12 +241,12 @@ void StarRing::Init()
 	InitVAO();
 	InitVBO();
 	
-	amount = 1000;
+	amount = 10000;
 	modelMatrices;
 	modelMatrices = new glm::mat4[amount];
 	srand(clock()); // 初始化随机种子    
-	float radius = 80.0;
-	float offset = 3.5f;
+	float radius = 180.0;
+	float offset =9.5f;
 	for (unsigned int i = 0; i < amount; i++)
 	{
 		glm::mat4 model;
