@@ -455,12 +455,11 @@ void TrainView::drawStuff(bool doingShadows)
 
 		spaceTest[1]->updateRotation(rotation, Point3d(planet->getPosition(0) + 20 + (r + 200) * 15 * cos(degree *  PI / 180.0) / 10.f, planet->getPosition(1), planet->getPosition(2) - (r + 100) * 15 * sin(degree * PI / 180.0) / 10.f + 80.f));
 		planet->render(P, MV, false, false);
-		ring->centerPoistion = QVector3D(0,30,0);
-		ring->render(P, MV);
 		spaceTest[1]->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
 		spaceTest[1]->render(P, MV, false, false);
 	}
-
+	ring->centerPoistion = QVector3D(0, 50, 0);
+	ring->render(P, MV);
 
 
 	//箭頭形艦隊render

@@ -12,19 +12,21 @@ uniform mat4 instanceMatrix;
 uniform vec3 center;
 
 layout(location = 0) in vec3 position;
-
+out vec2 textureCoorVs;
 
 vec3 rotationTransfer(float x, float y, float z,float sX,float sY,float sZ);
 
 void main(void)
 {	
-	vec3 newpos = position + center;
-	newpos = rotationTransfer(newpos.x, newpos.y, newpos.z,
+	textureCoorVs = position.xy;
+	if (textureCoorVs.x < 0) textureCoorVs.x = -textureCoorVs.x;
+	if (textureCoorVs.y < 0) textureCoorVs.y = -textureCoorVs.y;
+	vec3 newpos = rotationTransfer(position.x, position.y, position.z,
 								inputRot.x, inputRot.y, inputRot.z);
 								
 
 	newpos = (newpos + inputPos - inputConst)* scale ;
-    gl_Position = proj_matrix * model_matrix * instanceMatrix * vec4(newpos, 1.0);
+    gl_Position = proj_matrix * model_matrix * (instanceMatrix * vec4(newpos, 1.0) + vec4(center,0));
 	// normals = normal;
 }
 

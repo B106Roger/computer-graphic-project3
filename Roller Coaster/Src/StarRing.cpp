@@ -97,6 +97,7 @@ StarRing::StarRing(const QString &filePath, int s, Point3d p, ShaderType type)
 
 	file.close();
 	shadertype = type;
+	texture = new QOpenGLTexture(QImage("./Textures/Rock-Texture-Surface.jpg"));
 	Init();
 }
 StarRing::StarRing(StarRing* copyVersion)
@@ -158,6 +159,7 @@ void StarRing::render(GLfloat P[][4], GLfloat MV[][4], bool wireframe, bool norm
 		/*if (shadertype == REFLECTION || shadertype == REFRACTION)
 			glBindTexture(GL_TEXTURE_CUBE_MAP, StarRing::skyboxShaderID);*/
 		vvbo.release();
+		GLuint textureID = texture->textureId();
 		for (int i = 0; i < amount; i++)
 		{
 			GLfloat inst[4][4] =
@@ -167,6 +169,7 @@ void StarRing::render(GLfloat P[][4], GLfloat MV[][4], bool wireframe, bool norm
 				{modelMatrices[i][2][0],modelMatrices[i][2][1],modelMatrices[i][2][2],modelMatrices[i][2][3]},
 				{modelMatrices[i][3][0],modelMatrices[i][3][1],modelMatrices[i][3][2],modelMatrices[i][3][3]},
 			};
+			glBindTexture(GL_TEXTURE_2D, textureID);
 			shaderProgram->setUniformValue("instanceMatrix", inst);
 			glDrawElements(GL_TRIANGLES, m_pointIndices.size(), GL_UNSIGNED_INT, m_pointIndices.data());
 		}
@@ -242,8 +245,8 @@ void StarRing::Init()
 	modelMatrices;
 	modelMatrices = new glm::mat4[amount];
 	srand(clock()); // 初始化随机种子    
-	float radius = 50.0;
-	float offset = 2.5f;
+	float radius = 80.0;
+	float offset = 3.5f;
 	for (unsigned int i = 0; i < amount; i++)
 	{
 		glm::mat4 model;
@@ -252,7 +255,7 @@ void StarRing::Init()
 		float displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
 		float x = sin(angle) * radius + displacement;
 		displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
-		float y = displacement * 0.4f; // 让行星带的高度比x和z的宽度要小
+		float y = displacement * 1.2f; // 让行星带的高度比x和z的宽度要小
 		displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
 		float z = cos(angle) * radius + displacement;
 		model = glm::translate(model, glm::vec3(x, y, z));

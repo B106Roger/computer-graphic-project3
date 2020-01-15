@@ -3,7 +3,8 @@
 
 #include <QtCore/QString>
 #include <QtCore/QVector>
-
+#include <QtGui>  
+#include <QtOpenGL>  
 #include <QtGui/QOpenGLFunctions_4_3_Core>
 #include <QtGui/QOpenGLVertexArrayObject>
 #include <QtGui/QOpenGLBuffer>
@@ -74,6 +75,7 @@ private:
 	QVector3D eyePosition;
 	Point3d position;
 	Point3d rotation;
+	QOpenGLTexture *texture;
 
 	GLfloat rotMatrix[3][3];
 	QVector<Point3d> m_points;
