@@ -32,6 +32,10 @@ using std::vector; // avoid having to say std::vector all of the time
 // make use of other data structures from this project
 #include "ControlPoint.H"
 #include "Utilities/Pnt3f.H"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 
 enum SplineType { LINE, CARDINAL, B_SPLINE };
 
@@ -78,12 +82,14 @@ class CTrack {
 
 		vector<int> segmentNumber;
 		vector<float> segmentArclength;
+		float tensionScale;
+
 		static const int DIVIDE_LINE;
 		static const int SAMPLE_NUMBER;
 	private:
-		vector<vector<vector<float>>> M_curve;
+		//vector<vector<vector<float>>> M_curve;
+		vector<glm::mat4> M_curve;
 		
-
 };
 float distance(const Pnt3f &p1, const Pnt3f &p2);
 vector<vector<float>> Multiply(const vector<vector<float>> &m1, const vector<vector<float>> &m2);

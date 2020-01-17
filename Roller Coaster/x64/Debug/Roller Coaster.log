@@ -1,2 +1,1 @@
-﻿  StarRing.cpp
-  Roller Coaster.vcxproj -> C:\Users\admin\Desktop\圖學PROJECT3\computer-graphic-project3\x64\Debug\Roller Coaster.exe
+﻿LINK : fatal error LNK1168: 無法開啟 D:\GitHub\computer-graphic-project3\x64\Debug\\Roller Coaster.exe 進行寫入

@@ -34,6 +34,10 @@ void TrainView::initializeGL()
 	mountain = new Mountain(100, 100, Point3d(50, 0, 30), "./Textures/mountain_hieght_map.jfif", "./Textures/mountain_rock.jfif");
 	mountain->Init();
 
+	//Create Pillar Drawer
+	pillarDrawer = new PillarDrawer();
+	pillarDrawer->Init();
+
 	//Create a skybox object
 	sky = new Skybox();
 	sky->Init();
@@ -59,7 +63,7 @@ void TrainView::initializeGL()
 	// 其他物件
 	isTire = false;
 
-	spaceShip = new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 10.f, 3.f));
+	//spaceShip = new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 10.f, 3.f));
 	/*spaceShipReflection = new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 20.f, 3.f), REFLECTION);
 	spaceShipRefraction = new Model("./Object/Transport_Shuttle_obj.obj", 20, Point3d(-6.f, 20.f, 3.f), REFRACTION);*/
 
@@ -71,13 +75,13 @@ void TrainView::initializeGL()
 	//太空物件
 	planet = new Model("./Object/earth.obj", 50, Point3d(0, 0, 0), PLANET);
 
-	spaceTest = new Model*[4];
+	/*spaceTest = new Model*[4];
 	spaceTest[0] = new Model("./Object/Kameriexplorerflying.obj", 20, Point3d(0, 0, 0), NORMAL);
 	spaceTest[1] = new Model("./Object/Kameriexplorerflying.obj", 20, Point3d(0, 0, 0), CHASER);
 	spaceTest[2] = new Model("./Object/Kameriexplorerflying.obj", 20, Point3d(0, 0, 0), REFLECTION);
-	spaceTest[3] = new Model("./Object/Kameriexplorerflying.obj", 20, Point3d(0, 0, 0), REFRACTION);
+	spaceTest[3] = new Model("./Object/Kameriexplorerflying.obj", 20, Point3d(0, 0, 0), REFRACTION);*/
 
-	Human = new Model("./Objct/FinalBaseMesh.obj", 10, Point3d(0, 0, 0), NORMAL);
+	//Human = new Model("./Objct/FinalBaseMesh.obj", 10, Point3d(0, 0, 0), NORMAL);
 
 
 
@@ -87,32 +91,12 @@ void TrainView::initializeGL()
 	isrun = false;
 	// 火車速度
 	TRAIN_SPEED = 0.1f;
-	// 火車軌道曲線
-	vector<vector<float>>
-		spline_Linear =
-	{
-		{1,0,0,0},
-		{0,1,0,0},
-		{0,0,1,0},
-		{0,0,0,1},
-	},
-	spline_CardinalCubic =
-	{
-		{    -0.5,   1, -0.5,       0},
-		{     1.5,-2.5,    0,       1},
-		{    -1.5,   2,  0.5,       0},
-		{     0.5,-0.5,    0,       0},
-	},
-	spline_CubicB_Spline =
-	{
-		{-1.f / 6, 0.5, -0.5, 1.f / 6},
-		{     0.5,  -1,    0, 2.f / 3},
-		{    -0.5, 0.5,  0.5, 1.f / 6},
-		{ 1.f / 6,   0,    0,       0},
-	};
-	M_curve.push_back(spline_Linear);
-	M_curve.push_back(spline_CardinalCubic);
-	M_curve.push_back(spline_CubicB_Spline);
+
+	const float a = 1;
+	const Point3d as(0, 0, 1);
+	glm::mat3x4 b(a, a, a, a, a, a, a, a, a, a, a, a);
+	glm::mat3x4 c(as.x, as.x, as.x, as.x, as.x, as.x, as.x, as.x, as.x, as.x, as.x, as.x);
+
 }
 void TrainView::initializeTexture()
 {
@@ -203,8 +187,6 @@ void TrainView::paintGL()
 	glLightfv(GL_LIGHT2, GL_POSITION, lightPosition3);
 	glLightfv(GL_LIGHT2, GL_DIFFUSE, blueLight);
 
-	this->drawTurrnel();
-
 	//*********************************************************************
 	// now draw the ground plane
 	//*********************************************************************
@@ -260,8 +242,8 @@ void TrainView::paintGL()
 	square->End();
 
 	// Particle 特效
-	this->ProcessParticles();
-	this->DrawParticles();
+	//this->ProcessParticles();
+	//this->DrawParticles();
 
 
 }
@@ -390,6 +372,9 @@ void TrainView::drawStuff(bool doingShadows)
 	//####################################################################
 
 	this->drawTrack(doingShadows);
+	this->drawTurrnel();
+	AppMain::getInstance()->advanceTrain();
+	this->drawTrain(t_time);
 	mountain->render(P, MV);
 
 	mainPlanet->render(P, MV);
@@ -403,8 +388,7 @@ void TrainView::drawStuff(bool doingShadows)
 	// TODO: 
 	//	call your own train drawing code
 	//####################################################################
-	AppMain::getInstance()->advanceTrain();
-	this->drawTrain(t_time);
+	
 
 	static float degree = 0, r = 400;
 	static Point3d rotation(0, 0, 0);
@@ -425,7 +409,7 @@ void TrainView::drawStuff(bool doingShadows)
 	rotation.y = degree;
 
 	//星球 & 護星艦
-	for (int i = 0; i < 8; i++)
+	/*for (int i = 0; i < 8; i++)
 	{
 		switch (i)
 		{
@@ -467,13 +451,13 @@ void TrainView::drawStuff(bool doingShadows)
 		spaceTest[3]->render(P, MV, false, false);
 		spaceTest[2]->setEyePosition(arcball.eyeX, arcball.eyeY, arcball.eyeZ);
 		spaceTest[2]->render(P, MV, false, false);
-	}
+	}*/
 	ring->centerPoistion = QVector3D(0, 50, 0);
 	ring->render(P, MV);
 
 
 	//箭頭形艦隊render
-	switch (cnt)
+	/*switch (cnt)
 	{
 	case 0:
 		for (int j = 0; j < 3; j++)
@@ -562,7 +546,7 @@ void TrainView::drawStuff(bool doingShadows)
 			}
 		}
 		break;
-	}
+	}*/
 
 #ifdef EXAMPLE_SOLUTION
 	// don't draw the train if you're looking out the front window
@@ -578,7 +562,13 @@ drawTrack(bool doingShadows)
 	if (!doingShadows) {
 		glColor3ub(255, 255, 255);
 	}
+	GLfloat P[4][4];
+	GLfloat MV[4][4];
+	DimensionTransformation(ModelViewMatrex, MV);
+	DimensionTransformation(ProjectionMatrex, P);
+
 	Pnt3f previous_sample = this->m_pTrack->samplePoints.front().front();
+	vector<Pnt3f> pillarLocation;
 	for (int i = 0; i < this->m_pTrack->samplePoints.size(); i++)
 	{
 		vector<Pnt3f> &curveSamplePoint = this->m_pTrack->samplePoints[i];
@@ -656,12 +646,28 @@ drawTrack(bool doingShadows)
 				glVertex3f(sample2.x - cross_t.x, sample2.y - cross_t.y, sample2.z - cross_t.z);
 				glEnd();
 				glLineWidth(1);
+
+				float dist = distance(previous_sample, sample1);
+				if (dist > RAIL_WIDTH * 2)
+				{
+					/*pillarDrawer->location = QVector3D(sample1.x, sample1.y, sample1.z);
+					pillarDrawer->setVertices(sample1.y - 1.f, QVector3D(sample1.x, sample1.y, sample1.z));
+					pillarDrawer->Paint(P, MV);*/
+					pillarLocation.push_back(sample1);
+					previous_sample = sample1;
+				}
+				
 				break;
 			}
 			default:
 				break;
 			}
 		}
+	}
+
+	if (this->track == 2)
+	{
+		pillarDrawer->Paint(P, MV, pillarLocation);
 	}
 }
 

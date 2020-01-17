@@ -241,7 +241,7 @@ void StarRing::Init()
 	InitVAO();
 	InitVBO();
 	
-	amount = 10000;
+	amount = 1000;
 	modelMatrices;
 	modelMatrices = new glm::mat4[amount];
 	srand(clock()); // 初始化随机种子    

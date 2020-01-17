@@ -53,9 +53,10 @@ AppMain::AppMain(QWidget *parent)
 	connect( ui.rcpzadd		,SIGNAL(clicked()),this,SLOT(RotateControlPointAddZ())					);
 	connect( ui.rcpzsub		,SIGNAL(clicked()),this,SLOT(RotateControlPointSubZ())				);
 
-	connect(ui.tradd, SIGNAL(clicked()), this, SLOT(AddTrain()));
-	connect(ui.trsub, SIGNAL(clicked()), this, SLOT(SubTrain()));
-	connect(ui.Tire, SIGNAL(clicked()), this, SLOT(ToggleTire()));
+	connect(ui.train_add, SIGNAL(clicked()), this, SLOT(AddTrain()));
+	connect(ui.train_sub, SIGNAL(clicked()), this, SLOT(SubTrain()));
+	connect(ui.tire, SIGNAL(clicked()), this, SLOT(ToggleTire()));
+	connect(ui.tension, SIGNAL(valueChanged(int)), this, SLOT(ChangeTensionOfCurve(int)));
 }
 
 AppMain::~AppMain()
@@ -210,6 +211,12 @@ void AppMain::SubTrain()
 void AppMain::ToggleTire()
 {
 	this->trainview->isTire = !this->trainview->isTire;
+}
+
+void AppMain::ChangeTensionOfCurve(int val)
+{
+	this->trainview->m_pTrack->dirty = true;
+	this->trainview->m_pTrack->tensionScale = 1 + (val - 100.f) / 100.f;
 }
 
 void AppMain::ToggleMenuBar()

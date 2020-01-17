@@ -1,6 +1,5 @@
 #ifndef APPMAIN_H
 #define APPMAIN_H
-
 #include <QMainWindow>
 #include <QWidget>
 #include <QFileDialog>
@@ -8,41 +7,31 @@
 #include <qgl.h>
 #include "TrainView.h"  
 #include "Track.H"
-
-class CTrack;
-
 class AppMain : public QMainWindow
 {
 	Q_OBJECT
-
 public:
-	AppMain(QWidget *parent = 0);
-	~AppMain();
-
+	AppMain(QWidget *parent = 0);;
+	~AppMain();;
 	void ToggleMenuBar();
 	void ToggleToolBar();
 	void ToggleStatusBar();
 	void TogglePanel();
 
-	static AppMain *getInstance();
+	static AppMain *getInstance();;
 	static AppMain *Instance;
-
 public:
 	// call this method when things change
-	void damageMe();
-
+	void damageMe();;
 	// this moves the train forward on the track - its up to you to do this
 	// correctly. it gets called from the idle callback loop
 	// it should handle forward and backwards
-	void advanceTrain(float dir = 1);
-
-
+	void advanceTrain(float dir = 1);;
 public:
 	// keep track of the stuff in the world
-	CTrack				m_Track;
-
+	CTrack m_Track;
 	// the widgets that make up the Window
-	TrainView*			trainview;
+	TrainView *trainview;
 
 	bool canpan;
 	bool isHover;
@@ -79,6 +68,7 @@ private:
 		void SwitchPlayAndPause();
 	public slots:
 		void ChangeSpeedOfTrain( int val );
+		void ChangeTensionOfCurve(int val);
 		void ToggleTire();
 	private slots:
 		void AddControlPoint();

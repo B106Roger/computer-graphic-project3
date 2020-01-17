@@ -49,9 +49,6 @@
     <ClCompile Include="GeneratedFiles\Debug\moc_AppMain.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_AppMain.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="Src\AppMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -120,6 +117,9 @@
     </ClCompile>
     <ClCompile Include="Src\TGATexture.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_AppMain.cpp">
+      <Filter>Generated Files\Release</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

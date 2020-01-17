@@ -37,32 +37,27 @@ CTrack() : trainU(0), dirty(true), curveIndex(0), pointIndex(0)
 //============================================================================
 {
 	resetPoints();
-	vector<vector<float>>
-		spline_Linear =
-	{
-		{1,0,0,0},
-		{0,1,0,0},
-		{0,0,1,0},
-		{0,0,0,1},
-	},
-	spline_CardinalCubic =
-	{
-		{    -0.5,   1, -0.5,       0},
-		{     1.5,-2.5,    0,       1},
-		{    -1.5,   2,  0.5,       0},
-		{     0.5,-0.5,    0,       0},
-	},
-	spline_CubicB_Spline =
-	{
-		{-1.f / 6, 0.5, -0.5, 1.f / 6},
-		{     0.5,  -1,    0, 2.f / 3},
-		{    -0.5, 0.5,  0.5, 1.f / 6},
-		{ 1.f / 6,   0,    0,       0},
-	};
+	glm::mat4 spline_Linear(1);
+	glm::mat4 spline_CardinalCubic(
+		-1, 3,-3, 1, 
+		 2,-5, 4,-1, 
+		-1, 0, 1, 0,
+		 0, 2, 0, 0
+	);
+	glm::mat4 spline_CubicB_Spline(
+		-1, 3, -3, 1,
+		3, -6, 3, 0, 
+		-3, 0, 3, 0,
+		1, 4, 1, 0
+	);
+
+	
 	splineType = LINE;
 	M_curve.push_back(spline_Linear);
 	M_curve.push_back(spline_CardinalCubic);
 	M_curve.push_back(spline_CubicB_Spline);
+
+	tensionScale = 1.f;
 }
 
 //****************************************************************************
@@ -75,10 +70,10 @@ resetPoints()
 {
 
 	points.clear();
-	points.push_back(ControlPoint(Pnt3f(25, 5, 25)));
-	points.push_back(ControlPoint(Pnt3f(-25, 5, 25)));
-	points.push_back(ControlPoint(Pnt3f(-25, 5, -25)));
-	points.push_back(ControlPoint(Pnt3f(25, 5, -25)));
+	points.push_back(ControlPoint(Pnt3f(25, 15, 25)));
+	points.push_back(ControlPoint(Pnt3f(-25, 15, 25)));
+	points.push_back(ControlPoint(Pnt3f(-25, 15, -25)));
+	points.push_back(ControlPoint(Pnt3f(25, 15, -25)));
 
 	// we had better put the train back at the start of the track...
 	trainU = 0.0;
@@ -194,7 +189,7 @@ writePoints(const char* filename)
 	if (!fp) {
 		printf("Can't open file for writing");
 	} else {
-		fprintf(fp,"%d\n",points.size());
+		fprintf(fp,"%ud\n",points.size());
 		for(size_t i=0; i<points.size(); ++i)
 			fprintf(fp,"%g %g %g %g %g %g\n",
 				points[i].pos.x, points[i].pos.y, points[i].pos.z, 
@@ -261,7 +256,8 @@ computeSamplePoint()
 		}
 		break;
 	default:
-		const vector<vector<float>> &M = M_curve[splineType];
+		float tension = (splineType == 1 ? 1 / 2.f : 1 / 6.f);
+		glm::mat4 M = M_curve[splineType] * (tension * tensionScale);
 		for (size_t i = 0; i < this->points.size(); ++i)
 		{
 			// position
@@ -274,58 +270,47 @@ computeSamplePoint()
 			const Pnt3f &cp_orient_p2 = this->points[(i + 1) % this->points.size()].orient;
 			const Pnt3f &cp_orient_p3 = this->points[(i + 2) % this->points.size()].orient;
 			const Pnt3f &cp_orient_p4 = this->points[(i + 3) % this->points.size()].orient;
-
-			const vector<vector<float>>
-				G = {
-					{cp_pos_p1.x,cp_pos_p2.x,cp_pos_p3.x,cp_pos_p4.x},
-					{cp_pos_p1.y,cp_pos_p2.y,cp_pos_p3.y,cp_pos_p4.y},
-					{cp_pos_p1.z,cp_pos_p2.z,cp_pos_p3.z,cp_pos_p4.z},
-			},
-			G_orient = {
-				{cp_orient_p1.x,cp_orient_p2.x,cp_orient_p3.x,cp_orient_p4.x},
-				{cp_orient_p1.y,cp_orient_p2.y,cp_orient_p3.y,cp_orient_p4.y},
-				{cp_orient_p1.z,cp_orient_p2.z,cp_orient_p3.z,cp_orient_p4.z},
-			};
+			glm::mat4x3 G(
+				cp_pos_p1.x, cp_pos_p1.y, cp_pos_p1.z, 
+				cp_pos_p2.x, cp_pos_p2.y, cp_pos_p2.z, 
+				cp_pos_p3.x, cp_pos_p3.y, cp_pos_p3.z, 
+				cp_pos_p4.x, cp_pos_p4.y, cp_pos_p4.z
+			);
+			glm::mat4x3 G_orient(
+				cp_orient_p1.x, cp_orient_p1.y, cp_orient_p1.z,
+				cp_orient_p2.x, cp_orient_p2.y, cp_orient_p2.z,
+				cp_orient_p3.x, cp_orient_p3.y, cp_orient_p3.z,
+				cp_orient_p4.x, cp_orient_p4.y, cp_orient_p4.z
+			);
 
 			float percent = 1.0f / (DIVIDE_LINE);
 			float t = 0;
-			Pnt3f qt, qt0, orient_t1, orient_t2, tangent, normal;
+			glm::vec3 qt, qt0, orient_t1, orient_t2, tangent, normal;
 
-			vector<vector<float>>
-				T =
-			{
-				{0},
-				{0},
-				{0},
-				{1}
-			};
+			glm::vec4 T(0, 0, 0, 1);
 			// 用控制點求出內差點
-			vector<vector<float>> qt_v = Multiply(G, Multiply(M, T));
-			qt = Pnt3f(qt_v[0][0], qt_v[1][0], qt_v[2][0]);
+			glm::vec3 qt_v = G * (M *T);
+			qt = qt_v;
 
 
-			previousPoint = qt;
+			previousPoint = Pnt3f(qt.x, qt.y, qt.z);
 			for (size_t j = 0; j < DIVIDE_LINE; j++)
 			{
 				// 處理軌道線條
-				T = {
-					{pow(t,3)},
-					{pow(t,2)},
-					{t},
-					{1}
-				};
-				qt_v = Multiply(G, Multiply(M, T));
-				qt0 = Pnt3f(qt_v[0][0], qt_v[1][0], qt_v[2][0]);
+				T = glm::vec4(pow(t, 3), pow(t, 2), t, 1);
+				//qt_v = Multiply(G, Multiply(M, T));
+				qt_v = G * (M * T);
+				qt0 = qt_v;
 
-				vector<vector<float>> orient_v = Multiply(G_orient, Multiply(M, T));
-				orient_t1 = Pnt3f(orient_v[0][0], orient_v[1][0], orient_v[2][0]);
-				tangent = qt0 - previousPoint;
-				orient_t2 = orient_t1 * tangent;
-				normal = tangent * orient_t2;
-				normal.normalize();
+				glm::vec3 orient_v = G_orient * (M * T);;
+				orient_t1 = orient_v;
+				tangent = qt0 - glm::vec3(previousPoint.x, previousPoint.y, previousPoint.z);
+				orient_t2 = glm::cross(orient_t1, tangent);
+				normal = glm::cross(tangent, orient_t2);
+				normal /= sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
 
-				samplePoints[i][j] = (qt0);
-				normalVectors[i][j] = (normal);
+				samplePoints[i][j] = Pnt3f(qt0.x, qt0.y, qt0.z);
+				normalVectors[i][j] = Pnt3f(normal.x, normal.y, normal.z);
 
 				t += percent;
 			}

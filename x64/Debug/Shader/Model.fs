@@ -25,5 +25,4 @@ void main()
 	float specular = pow(max(0.0, dot(vs_normal, half_vector)), shininess);
 	color = min(Color * color_ambient, vec4(1.0))
 			+ diffuse * color_diffuse + specular * color_specular;
-	vec4(1,0,0,1);
 }

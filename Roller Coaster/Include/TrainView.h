@@ -18,7 +18,9 @@
 #include "Mountain.h"
 #include "Tire.h"
 #include "StarRing.h"
-
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 class AppMain;
 class CTrack;
@@ -112,12 +114,14 @@ public:
 	float speed;
 	bool isrun;
 	bool isTire;
-	vector<vector<vector<float>>> M_curve;
+	//vector<vector<vector<float>>> M_curve;
 
 	Triangle* triangle;
 	Water *water;
 	Tire *tire;
+	PillarDrawer *pillarDrawer;
 	Square* square;
+
 
 	GLfloat ProjectionMatrex[16];
 	GLfloat ModelViewMatrex[16];
